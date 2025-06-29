@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <form @submit.prevent="handleLogin" class="login-form">
+    <form @submit.prevent="login" class="login-form">
       <h2 class="title">🔐 Login</h2>
 
       <div class="form-group">
@@ -28,26 +28,32 @@ import { useRouter } from 'vue-router'
 const email = ref('')
 const password = ref('')
 const error = ref(null)
+
 const router = useRouter()
 
-const handleLogin = async () => {
+const login = async () => {
   error.value = null
   try {
-    const response = await axios.post('http://localhost:8000/api/login', {
+    const response = await axios.post('http://localhost:8080/api/login', {
       email: email.value,
       password: password.value
     })
 
-    // Exemplo: salvar o usuário ou token
-    localStorage.setItem('user', JSON.stringify(response.data.user))
+  localStorage.setItem('token', response.data.token);
+    
 
-    // Redirecionar após o login
-    router.push('/chamados')
+
+    router.push('/funcionarios')
   } catch (err) {
-    error.value = err.response?.data?.message || 'Erro ao fazer login.'
+    if (err.response && err.response.status === 401) {
+      error.value = 'Credenciais inválidas.'
+    } else {
+      error.value = 'Erro ao tentar logar. Tente novamente.'
+    }
   }
 }
 </script>
+
 
 <style scoped>
 .login-container {

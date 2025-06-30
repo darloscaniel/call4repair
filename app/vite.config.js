@@ -3,10 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import laravel from 'laravel-vite-plugin'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
-console.log('Vite config carregado!');
+console.log('Vite config carregado!')
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd());
+  const env = loadEnv(mode, process.cwd())
 
   return {
     plugins: [
@@ -24,6 +24,17 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
+    resolve: {
+      alias: {
+        'jquery': 'jquery/dist/jquery.slim.js',
+      }
+    },
+    optimizeDeps: {
+      include: [
+        'jquery',
+        'datatables.net'
+      ]
+    },
     server: {
       host: '0.0.0.0',
       port: parseInt(env.VITE_PORT),
@@ -36,5 +47,5 @@ export default defineConfig(({ mode }) => {
     define: {
       global: 'window'
     }
-  };
-});
+  }
+})

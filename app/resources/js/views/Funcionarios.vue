@@ -1,87 +1,92 @@
 <template>
-  <div v-if="loaded">
+  <div>
     <h2 class="titulo">👥 Funcionários</h2>
 
-    <div class="lista-funcionarios">
-      <div v-for="n in 3" :key="n" class="card-funcionario">
-        <h3 class="nome">Funcionário {{ n }}</h3>
-        <p class="detalhe">Cargo: Técnico</p>
-        <p class="detalhe">Email: funcionario{{ n }}@empresa.com</p>
-      </div>
-    </div>
+    <EasyDataTable
+      :headers="headers"
+      :items="funcionarios"
+      :loading="loading"
+      :search-value="search"
+      theme-color="#2d89ef"
+      class="tabela"
+    >
+      <template #item-actions="{ item }">
+        <button class="btn-editar" @click="editar(item.id)">Editar</button>
+        <button class="btn-excluir" @click="excluir(item.id)">Excluir</button>
+      </template>
+    </EasyDataTable>
   </div>
 </template>
 
 <script setup>
-import { ref, onBeforeMount } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import EasyDataTable from 'vue3-easy-data-table'
+import 'vue3-easy-data-table/dist/style.css'
+import api from '../api' // se estiver usando axios customizado
 
-const router = useRouter()
-const loaded = ref(false)
+const funcionarios = ref([])
+const loading = ref(true)
+const search = ref('')
+const error = ref(null)
 
-onBeforeMount(() => {
-  const token = sessionStorage.getItem('token')
-  if (!token) {
-    router.push('/login')
-  } else {
-    loaded.value = true
+const headers = [
+  { text: 'ID', value: 'id' },
+  { text: 'Nome', value: 'name' },
+  { text: 'Email', value: 'email' },
+  { text: 'Telefone', value: 'phone' },
+  { text: 'Ações', value: 'actions' },
+]
+
+onMounted(async () => {
+  try {
+    const { data } = await api.get('/employees') // ou fetch
+    funcionarios.value = data
+  } catch (err) {
+    error.value = 'Erro ao carregar funcionários.'
+    console.error(err)
+  } finally {
+    loading.value = false
   }
 })
+
+const editar = (id) => {
+  console.log('Editar', id)
+}
+
+const excluir = (id) => {
+  console.log('Excluir', id)
+}
 </script>
-
-
 
 <style scoped>
 .titulo {
-  font-size: 1.875rem; /* 3xl = 30px approx */
+  font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 24px;
-  color: #2d3748; /* text-gray-800 */
+  color: #2d3748;
 }
 
-/* Grid responsivo */
-.lista-funcionarios {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  /* md:grid-cols-2 */
-  .lista-funcionarios {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  /* lg:grid-cols-3 */
-  .lista-funcionarios {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.card-funcionario {
-  background-color: white;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+.tabela {
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
   border-radius: 12px;
-  padding: 16px;
-  border: 1px solid #f7fafc; /* gray-100 */
-  transition: box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
-.card-funcionario:hover {
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+.btn-editar, .btn-excluir {
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
 }
 
-.nome {
-  font-size: 1.25rem; /* xl = 20px */
-  font-weight: 600;
-  color: #4a5568; /* text-gray-700 */
-  margin-bottom: 8px;
+.btn-editar {
+  background-color: #4299e1;
+  color: white;
 }
 
-.detalhe {
-  color: #a0aec0; /* text-gray-500 */
-  margin: 2px 0;
+.btn-excluir {
+  background-color: #f56565;
+  color: white;
 }
 </style>

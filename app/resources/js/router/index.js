@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Funcionarios from '../views/Funcionarios.vue'
 import Chamados from '../views/Chamados.vue'
 import Login from '../views/Login.vue'
+import Forms from '../views/Formulario.vue'
 
 const requireAuth = (to, from, next) => {
   const token = sessionStorage.getItem('token')
@@ -15,7 +16,8 @@ const routes = [
   { path: '/', redirect: '/login' },
   { path: '/funcionarios', component: Funcionarios, beforeEnter: requireAuth }, // corrigido
   { path: '/chamados', component: Chamados, beforeEnter: requireAuth },         // corrigido
-  { path: '/login', component: Login }
+  { path: '/login', component: Login },
+  { path: '/formulario', component: Forms}
 ]
 
 const router = createRouter({

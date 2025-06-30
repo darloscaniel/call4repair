@@ -1,7 +1,8 @@
 <template>
   <div class="layout">
-    <Sidebar v-if="route.path !== '/login'" />
+    <Sidebar v-if="!['/login', '/formulario'].includes(route.path)" />
     
+
     <main class="conteudo">
       <RouterView />
     </main>

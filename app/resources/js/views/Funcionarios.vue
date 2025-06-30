@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="loaded">
     <h2 class="titulo">👥 Funcionários</h2>
 
     <div class="lista-funcionarios">
@@ -11,6 +11,25 @@
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const loaded = ref(false)
+
+onBeforeMount(() => {
+  const token = sessionStorage.getItem('token')
+  if (!token) {
+    router.push('/login')
+  } else {
+    loaded.value = true
+  }
+})
+</script>
+
+
 
 <style scoped>
 .titulo {

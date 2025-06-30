@@ -3,21 +3,19 @@ import Funcionarios from '../views/Funcionarios.vue'
 import Chamados from '../views/Chamados.vue'
 import Login from '../views/Login.vue'
 
-
 const requireAuth = (to, from, next) => {
-  const token = localStorage.getItem('token')
+  const token = sessionStorage.getItem('token')
   if (!token) {
     return next('/login')
   }
   next()
 }
 
-
 const routes = [
   { path: '/', redirect: '/login' },
-  { path: '/funcionarios', component: Funcionarios, BeforeEnter: requireAuth },
-  { path: '/chamados', component: Chamados, BeforeEnter: requireAuth },
-  {path: '/login', component: Login }
+  { path: '/funcionarios', component: Funcionarios, beforeEnter: requireAuth }, // corrigido
+  { path: '/chamados', component: Chamados, beforeEnter: requireAuth },         // corrigido
+  { path: '/login', component: Login }
 ]
 
 const router = createRouter({
@@ -28,7 +26,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const publicPages = ['/login']
   const authRequired = !publicPages.includes(to.path)
-  const loggedIn = localStorage.getItem('token')
+  const loggedIn = sessionStorage.getItem('token')
 
   if (authRequired && !loggedIn) {
     return next('/login')
@@ -36,5 +34,6 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
+
 
 export default router

@@ -21,15 +21,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const error = ref(null)
-
 const router = useRouter()
+
+// 🔒 Limpa o token sempre que entrar na tela de login
+onBeforeMount(() => {
+  sessionStorage.removeItem('token')
+})
 
 const login = async () => {
   error.value = null
@@ -39,10 +43,7 @@ const login = async () => {
       password: password.value
     })
 
-  localStorage.setItem('token', response.data.token);
-    
-
-
+    sessionStorage.setItem('token', response.data.token)
     router.push('/funcionarios')
   } catch (err) {
     if (err.response && err.response.status === 401) {
@@ -53,6 +54,7 @@ const login = async () => {
   }
 }
 </script>
+
 
 
 <style scoped>

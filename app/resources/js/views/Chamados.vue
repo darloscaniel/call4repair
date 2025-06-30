@@ -37,12 +37,23 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+onBeforeMount(() => {
+  const token = sessionStorage.getItem('token')
+  if (!token) {
+    router.push('/login')
+  }
+})
 
 const chamados = ref([])
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:8000/calls')
+    const response = await fetch('http://localhost:8080/calls')
     const data = await response.json()
     chamados.value = data
   } catch (error) {

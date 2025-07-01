@@ -3,20 +3,21 @@
     <h2 class="titulo">🛠️ Chamados</h2>
 
     <div class="table-wrapper">
-      <EasyDataTable
-        v-if="!loading"
-        :headers="headers"
-        :items="processedChamados"
-        theme-color="#2d89ef"
-        table-class-name="customize-table"
-        header-text-direction="center"
-        body-text-direction="center"
-        alternating
-        :rows-per-page="25"
-        show-index
-        :loading="loading"
-        :search-value="search"
-      >
+<EasyDataTable
+v-if="!loading"
+:headers="headers"
+:items="processedChamados"
+theme-color="#2d89ef"
+table-class-name="customize-table"
+header-text-direction="center"
+body-text-direction="center"
+alternating
+:rows-per-page="25"
+show-index
+:loading="loading"
+:search-value="search"
+@click-row="openModal"
+>
         <template #item-status="{ status }">
           <div class="status-container">
             <span :class="['status-badge', statusClass(status)]">
@@ -25,17 +26,30 @@
           </div>
         </template>
 
-        <template #item-employees="{ employees }">
+        <template #item-employees="{ employees, item }">
           <div class="employees-container">
             <ul v-if="employees && employees.length" class="employees-list">
               <li v-for="func in employees" :key="func.id">
-                <span class="employee-badge">{{ func.name }}</span>
+              <span class="employee-badge">{{ func.name }}</span>
               </li>
             </ul>
-            <span v-else class="no-employees">-</span>
+            <span v-else class="no-employees">Clique para atribuir</span>
+          </div>
+        </template>
+        <template #item-description="{ description }">
+          <div class="description-cell" :title="description">
+            {{ description }}
           </div>
         </template>
       </EasyDataTable>
+      <ChamadosModal
+         v-if="showModal"
+        :chamado="selectedChamado"
+        :funcionarios="allFuncionarios"
+        @close="showModal = false"
+        @save="handleSave"
+    
+      />
     </div>
   </div>
 </template>
@@ -46,13 +60,16 @@ import { useRouter } from 'vue-router'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import api from '../api'
+import ChamadosModal from '@/components/ChamadosModal.vue'
 
 const router = useRouter()
 const chamados = ref([])
 const loading = ref(true)
 const search = ref('')
+const showModal = ref(false)
+const selectedChamado = ref({})
+const allFuncionarios = ref([])
 
-// Processa os chamados para garantir que employees exista
 const processedChamados = computed(() => {
   return chamados.value.map(chamado => ({
     ...chamado,
@@ -81,6 +98,30 @@ const statusText = (status) => {
   return map[status] || status
 }
 
+const openModal = (row) => {
+  if (!row || typeof row !== 'object') return
+  selectedChamado.value = { ...row, employees: row.employees || [] }
+  showModal.value = true
+}
+
+const handleSave = async (updated) => {
+  try {
+    const response = await api.put(`/calls/${updated.id}`, {
+      status: updated.status,
+      employees: updated.employees.map(e => e.id)
+    })
+    const updatedData = response.data
+
+    chamados.value = chamados.value.map(ch =>
+      ch.id === updatedData.id ? updatedData : ch
+    )
+
+    showModal.value = false
+  } catch (err) {
+    console.error('Erro ao salvar chamado:', err)
+  }
+}
+
 onMounted(async () => {
   try {
     const token = sessionStorage.getItem('token')
@@ -88,6 +129,9 @@ onMounted(async () => {
       router.push('/login')
       return
     }
+
+    const { data: funcionariosData } = await api.get('/employees')
+    allFuncionarios.value = funcionariosData
 
     const { data } = await api.get('/calls')
     chamados.value = data.map(item => ({
@@ -177,17 +221,22 @@ onMounted(async () => {
 
 .status-aberto {
   background-color: #fed7d7;
-  color: #e53e3e;
+  color: #dd00fa;
 }
 
 .status-em_andamento {
   background-color: #feebc8;
-  color: #dd6b20;
+  color: #dd8520;
 }
 
 .status-concluido {
   background-color: #c6f6d5;
   color: #38a169;
+}
+
+.status-recusado {
+  background-color: #c6f6d5;
+  color: #7e0000;
 }
 
 .easy-data-table__pagination {
@@ -202,4 +251,22 @@ onMounted(async () => {
 .easy-data-table__body tr:hover {
   background-color: #ebf8ff;
 }
+
+.clickable-cell {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-cell:hover {
+  background-color: #edf2f7;
+}
+
+.description-cell {
+  max-width: 300px; /* ajuste conforme necessário */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
 </style>

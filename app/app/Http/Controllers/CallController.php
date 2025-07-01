@@ -20,7 +20,7 @@ class CallController extends Controller
             'customer_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'description' => 'required|string|max:1000',
-            'status' => 'required|in:Aberto,Em Andamento,Finalizado',
+            'status' => 'required|in:aberto,em_andamento,concluido,recusado',
             'employees' => 'array',
             'employees.*' => 'exists:employees,id',  // valida se cada id existe na tabela employees
         ]);
@@ -52,7 +52,7 @@ class CallController extends Controller
             'customer_name' => 'sometimes|required|string|max:255',
             'phone' => 'sometimes|required|string|max:20',
             'description' => 'sometimes|required|string|max:1000',
-            'status' => 'sometimes|required|in:Aberto,Em Andamento,Finalizado',
+            'status' => 'sometimes|required|in:aberto,em_andamento,concluido,recusado',
             'employees' => 'sometimes|array',
             'employees.*' => 'exists:employees,id',
         ]);

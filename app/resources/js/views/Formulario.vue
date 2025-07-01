@@ -62,7 +62,7 @@ const form = ref({
   nome: '',
   telefone: '',
   descricao: '',
-  status: 'Aberto',
+  status: 'aberto',
 })
 
 const submitChamado = async () => {
@@ -86,7 +86,7 @@ const submitChamado = async () => {
     if (!response.ok) throw new Error('Erro ao criar chamado')
 
     alert('Chamado criado com sucesso!')
-    form.value = { nome: '', descricao: '', status: 'Aberto' }
+    form.value = { nome: '', descricao: '', status: 'aberto' }
   } catch (error) {
     console.error('Erro ao criar chamado:', error)
     alert('Erro ao criar chamado. Tente novamente.')

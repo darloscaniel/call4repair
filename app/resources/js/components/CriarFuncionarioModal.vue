@@ -1,7 +1,7 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
-      <h3>Cadastrar Funcionário</h3>
+      <h3>{{ isEdicao ? 'Editar Funcionário' : 'Cadastrar Funcionário' }}</h3>
 
       <form @submit.prevent="submitForm">
         <div class="form-group">
@@ -63,22 +63,40 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, watch, computed } from 'vue'
+
+const props = defineProps({
+  funcionario: {
+    type: Object,
+    default: () => ({ name: '', age: '', phone: '', email: '' })
+  }
+})
 
 const emit = defineEmits(['close', 'save'])
 
 const form = reactive({
+  id: null,
   name: '',
   age: null,
   phone: '',
   email: ''
 })
 
+const isEdicao = computed(() => !!form.id)
+
+watch(() => props.funcionario, (novo) => {
+  form.id = novo.id || null
+  form.name = novo.name || ''
+  form.age = novo.age || null
+  form.phone = novo.phone || ''
+  form.email = novo.email || ''
+}, { immediate: true })
+
 const submitForm = () => {
-  // Você pode adicionar validações adicionais aqui se quiser
   emit('save', { ...form })
 }
 </script>
+
 
 <style scoped>
 .modal-overlay {

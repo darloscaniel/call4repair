@@ -93,7 +93,8 @@ const statusText = (status) => {
   const map = {
     'aberto': 'Aberto',
     'em_andamento': 'Em Andamento',
-    'concluido': 'Concluído'
+    'concluido': 'Concluído',
+    'recusado': 'Recusado'
   }
   return map[status] || status
 }
@@ -220,8 +221,8 @@ onMounted(async () => {
 
 
 .status-aberto {
-  background-color: #fed7d7;
-  color: #dd00fa;
+  background-color: #ffa4ff;
+  color: #7a018a;
 }
 
 .status-em_andamento {
@@ -235,7 +236,7 @@ onMounted(async () => {
 }
 
 .status-recusado {
-  background-color: #c6f6d5;
+  background-color: #f6c6c6;
   color: #7e0000;
 }
 

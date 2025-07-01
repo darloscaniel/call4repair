@@ -9,11 +9,13 @@
       </button>
     </div>
 
-    <ModalFuncionario
-  v-if="showModalCriar"
-  @close="showModalCriar = false"
-  @save="handleSalvarFuncionario"
+ <ModalFuncionario
+  v-if="showModalCriar || showModalEditar"
+  :funcionario="funcionarioSelecionado"
+  @close="fecharModal"
+  @save="handleSalvarOuAtualizar"
 />
+
 
 
     <div class="table-wrapper">
@@ -61,6 +63,8 @@ import api from '../api'
 import ModalFuncionario from '@/components/CriarFuncionarioModal.vue'
 
 const showModalCriar = ref(false)
+const showModalEditar = ref(false)
+const funcionarioSelecionado = ref(null)
 const funcionarios = ref([])
 const loading = ref(true)
 const search = ref('')
@@ -76,21 +80,41 @@ const headers = [
 ]
 
 const criarFuncionario = () => {
+  funcionarioSelecionado.value = { name: '', age: '', phone: '', email: '' }
   showModalCriar.value = true
 }
 
-const handleSalvarFuncionario = async (novoFuncionario) => {
-  try {
-    const response = await api.post('/employees', novoFuncionario)
-    funcionarios.value.push(response.data)
-    showModalCriar.value = false
-  } catch (error) {
-    console.error('Erro ao criar funcionário:', error)
+const editar = (id) => {
+  const func = funcionarios.value.find(f => f.id === id)
+  if (func) {
+    funcionarioSelecionado.value = { ...func }
+    showModalEditar.value = true
   }
 }
 
+const handleSalvarOuAtualizar = async (func) => {
+  try {
+    if (func.id) {
+      // Atualizar
+      const response = await api.put(`/employees/${func.id}`, func)
+      const atualizado = response.data
+      funcionarios.value = funcionarios.value.map(f => f.id === atualizado.id ? atualizado : f)
+    } else {
+      // Criar novo
+      const response = await api.post('/employees', func)
+      funcionarios.value.push(response.data)
+    }
+  } catch (error) {
+    console.error('Erro ao salvar funcionário:', error)
+  } finally {
+    fecharModal()
+  }
+}
 
-
+const fecharModal = () => {
+  showModalCriar.value = false
+  showModalEditar.value = false
+}
 
 onMounted(async () => {
   try {
@@ -104,12 +128,15 @@ onMounted(async () => {
   }
 })
 
-const editar = (id) => {
-  console.log('Editar', id)
-}
-
-const excluir = (id) => {
-  console.log('Excluir', id)
+const excluir = async (id) => {
+  if (confirm('Tem certeza que deseja excluir este funcionário?')) {
+    try {
+      await api.delete(`/employees/${id}`)
+      funcionarios.value = funcionarios.value.filter(f => f.id !== id)
+    } catch (error) {
+      console.error('Erro ao excluir funcionário:', error)
+    }
+  }
 }
 
 const updateRowsPerPage = (value) => {

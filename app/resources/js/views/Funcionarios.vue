@@ -2,6 +2,20 @@
   <div class="funcionarios-container">
     <h2 class="titulo">👥 Funcionários</h2>
 
+    <!-- Botão Criar Funcionário -->
+    <div class="actions-top">
+      <button class="btn-criar" @click="criarFuncionario">
+        <i class="fas fa-plus"></i> Criar Funcionário
+      </button>
+    </div>
+
+    <ModalFuncionario
+  v-if="showModalCriar"
+  @close="showModalCriar = false"
+  @save="handleSalvarFuncionario"
+/>
+
+
     <div class="table-wrapper">
       <EasyDataTable
         :headers="headers"
@@ -44,7 +58,9 @@ import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 import api from '../api'
+import ModalFuncionario from '@/components/CriarFuncionarioModal.vue'
 
+const showModalCriar = ref(false)
 const funcionarios = ref([])
 const loading = ref(true)
 const search = ref('')
@@ -59,9 +75,22 @@ const headers = [
   { text: 'Ações', value: 'actions', width: 200 }
 ]
 
-const updateRowsPerPage = (value) => {
-  rowsPerPage.value = value
+const criarFuncionario = () => {
+  showModalCriar.value = true
 }
+
+const handleSalvarFuncionario = async (novoFuncionario) => {
+  try {
+    const response = await api.post('/employees', novoFuncionario)
+    funcionarios.value.push(response.data)
+    showModalCriar.value = false
+  } catch (error) {
+    console.error('Erro ao criar funcionário:', error)
+  }
+}
+
+
+
 
 onMounted(async () => {
   try {
@@ -82,6 +111,10 @@ const editar = (id) => {
 const excluir = (id) => {
   console.log('Excluir', id)
 }
+
+const updateRowsPerPage = (value) => {
+  rowsPerPage.value = value
+}
 </script>
 
 <style scoped>
@@ -97,6 +130,32 @@ const excluir = (id) => {
   margin-bottom: 1.5rem;
   color: #2d3748;
   text-align: center;
+}
+
+/* Container do botão criar acima da tabela */
+.actions-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.btn-criar {
+  background-color: #38a169;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-criar:hover {
+  background-color: #2f855a;
 }
 
 .table-wrapper {
@@ -141,74 +200,5 @@ const excluir = (id) => {
 
 .btn-excluir:hover {
   background-color: #e53e3e;
-}
-</style>
-
-<style>
-/* Estilos globais da tabela */
-.customize-table {
-  --easy-table-header-font-size: 14px;
-  --easy-table-header-height: 50px;
-  --easy-table-header-item-padding: 10px 15px;
-  --easy-table-body-row-height: 60px;
-  --easy-table-body-item-padding: 10px 15px;
-  --easy-table-footer-height: 50px;
-  --easy-table-footer-font-size: 14px;
-  --easy-table-footer-padding: 0 15px;
-}
-
-.phone-number {
-  font-family: monospace;
-  font-size: 0.95rem;
-}
-
-.easy-data-table__pagination {
-  padding: 15px;
-  border-top: 1px solid #e2e8f0;
-  position: relative;
-  z-index: 1;
-}
-
-.easy-data-table__body tr:nth-child(even) {
-  background-color: #f7fafc;
-}
-
-.easy-data-table__body tr:hover {
-  background-color: #ebf8ff;
-}
-
-/* Estilos específicos para o dropdown "Rows per page" */
-.easy-data-table__rows-per-page {
-  position: relative;
-  display: inline-block;
-  margin-right: 10px;
-}
-
-.easy-data-table__rows-per-page-select {
-  position: relative;
-  z-index: 2;
-}
-
-.easy-data-table__rows-per-page-select select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding: 6px 30px 6px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  background-color: white;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 16px;
-  cursor: pointer;
-  font-size: 14px;
-  min-width: 80px;
-}
-
-.easy-data-table__rows-per-page-select select:focus {
-  outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 1px #4299e1;
 }
 </style>

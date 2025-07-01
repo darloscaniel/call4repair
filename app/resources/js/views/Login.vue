@@ -15,7 +15,10 @@
 
       <div v-if="error" class="error-message">{{ error }}</div>
 
-      <button type="submit">Entrar</button>
+      <button type="submit">Entrar</button> 
+      <button type="button" @click="goToFormulario" class="formulario-btn">
+      Abrir Chamado
+      </button> 
     </form>
   </div>
 </template>
@@ -30,7 +33,10 @@ const password = ref('')
 const error = ref(null)
 const router = useRouter()
 
-// 🔒 Limpa o token sempre que entrar na tela de login
+const goToFormulario = () => {
+  router.push('/formulario')
+}
+
 onBeforeMount(() => {
   sessionStorage.removeItem('token')
 })
@@ -118,4 +124,21 @@ button:hover {
   font-size: 0.875rem;
   text-align: center;
 }
+
+.formulario-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #05a100;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 2%;
+}
+
+.formulario-btn:hover {
+  background-color: #3e8e41;
+}
+
 </style>

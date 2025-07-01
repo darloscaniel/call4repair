@@ -12,6 +12,7 @@ class Call extends Model
 
     protected $fillable = [
         'customer_name',
+        'phone',
         'description',
         'status',
     ];

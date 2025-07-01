@@ -7,10 +7,13 @@ use App\Http\Controllers\UserController;
 use App\Models\Call;
 
 Route::post('login', [UserController::class, 'login']);
-Route::post('forms', [CallController::class, 'forms']);
+Route::post('calls', [CallController::class, 'store']);
 
 Route::middleware('auth:api')->group(function () {
-    Route::apiResource('calls', CallController::class);
+        Route::get('calls', [CallController::class, 'index']);
+    Route::get('calls/{call}', [CallController::class, 'show']);
+    Route::put('calls/{call}', [CallController::class, 'update']);
+    Route::delete('calls/{call}', [CallController::class, 'destroy']);
     Route::apiResource('employees', EmployeeController::class);
 });
 

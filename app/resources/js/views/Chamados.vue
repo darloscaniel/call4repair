@@ -62,6 +62,7 @@ const processedChamados = computed(() => {
 
 const headers = [
   { text: 'Cliente', value: 'customer_name' },
+  { text: 'Telefone', value: 'phone', width: 150 },
   { text: 'Descrição', value: 'description' },
   { text: 'Status', value: 'status', width: 150 },
   { text: 'Funcionários', value: 'employees' }

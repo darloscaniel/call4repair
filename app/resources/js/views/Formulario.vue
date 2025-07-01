@@ -1,5 +1,7 @@
 <template>
+<h2 class="titulo">🔧 Call4Repair 🔧</h2>
   <div class="form-container">
+    
     <h2>Criar Novo Chamado</h2>
     <form @submit.prevent="submitChamado">
       <div class="form-group">
@@ -10,6 +12,17 @@
           v-model="form.nome"
           required
           placeholder="Seu nome"
+        />
+      </div>
+
+        <div class="form-group">
+        <label for="nome">Telefone Para Contato:</label>
+        <input
+          type="text"
+          id="telefone"
+          v-model="form.telefone"
+          required
+          placeholder="Ex: (11) 91234-5678"
         />
       </div>
 
@@ -41,21 +54,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 const form = ref({
   nome: '',
+  telefone: '',
   descricao: '',
   status: 'Aberto',
-});
+})
 
-const submitChamado = () => {
-  console.log('Chamado enviado:', form.value);
-  alert('Chamado criado com sucesso!');
-  router.push('/');
-};
+const submitChamado = async () => {
+  try {
+    const payload = {
+      customer_name: form.value.nome,
+      phone: form.value.telefone,
+      description: form.value.descricao,
+      status: form.value.status,
+    }
+
+    const response = await fetch('http://localhost:8080/api/calls', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    })
+
+    if (!response.ok) throw new Error('Erro ao criar chamado')
+
+    alert('Chamado criado com sucesso!')
+    form.value = { nome: '', descricao: '', status: 'Aberto' }
+  } catch (error) {
+    console.error('Erro ao criar chamado:', error)
+    alert('Erro ao criar chamado. Tente novamente.')
+  }
+}
 </script>
 
 <style scoped>

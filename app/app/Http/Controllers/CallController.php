@@ -18,6 +18,7 @@ class CallController extends Controller
     {
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
             'description' => 'required|string|max:1000',
             'status' => 'required|in:Aberto,Em Andamento,Finalizado',
             'employees' => 'array',
@@ -27,6 +28,7 @@ class CallController extends Controller
         // Criar chamado
         $call = Call::create([
             'customer_name' => $validated['customer_name'],
+            'phone' => $validated['phone'],
             'description' => $validated['description'],
             'status' => $validated['status'],
         ]);
@@ -48,13 +50,14 @@ class CallController extends Controller
     {
         $validated = $request->validate([
             'customer_name' => 'sometimes|required|string|max:255',
+            'phone' => 'sometimes|required|string|max:20',
             'description' => 'sometimes|required|string|max:1000',
             'status' => 'sometimes|required|in:Aberto,Em Andamento,Finalizado',
             'employees' => 'sometimes|array',
             'employees.*' => 'exists:employees,id',
         ]);
 
-        $call->update($request->only(['customer_name', 'description', 'status']));
+        $call->update($request->only(['customer_name','phone', 'description', 'status']));
 
         if (isset($validated['employees'])) {
             $call->employees()->sync($validated['employees']);

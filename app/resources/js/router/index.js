@@ -26,7 +26,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login']
+  const publicPages = ['/login', '/formulario']
   const authRequired = !publicPages.includes(to.path)
   const loggedIn = sessionStorage.getItem('token')
 

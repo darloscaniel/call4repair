@@ -2,21 +2,26 @@
   <div class="funcionarios-container">
     <h2 class="titulo">👥 Funcionários</h2>
 
-    <!-- Botão Criar Funcionário -->
+
     <div class="actions-top">
       <button class="btn-criar" @click="criarFuncionario">
         <i class="fas fa-plus"></i> Criar Funcionário
       </button>
     </div>
-
+<div class="search-box">
+  <input
+    type="text"
+    v-model="search"
+    placeholder="🔍 Pesquisar funcionário..."
+    class="input-pesquisa"
+  />
+</div>
  <ModalFuncionario
   v-if="showModalCriar || showModalEditar"
   :funcionario="funcionarioSelecionado"
   @close="fecharModal"
   @save="handleSalvarOuAtualizar"
 />
-
-
 
     <div class="table-wrapper">
       <EasyDataTable
@@ -72,7 +77,6 @@ const error = ref(null)
 const rowsPerPage = ref(25)
 
 const headers = [
-  { text: 'ID', value: 'id', width: 80 },
   { text: 'Nome', value: 'name' },
   { text: 'Email', value: 'email' },
   { text: 'Telefone', value: 'phone', width: 150 },
@@ -95,12 +99,12 @@ const editar = (id) => {
 const handleSalvarOuAtualizar = async (func) => {
   try {
     if (func.id) {
-      // Atualizar
+
       const response = await api.put(`/employees/${func.id}`, func)
       const atualizado = response.data
       funcionarios.value = funcionarios.value.map(f => f.id === atualizado.id ? atualizado : f)
     } else {
-      // Criar novo
+   
       const response = await api.post('/employees', func)
       funcionarios.value.push(response.data)
     }
@@ -159,7 +163,6 @@ const updateRowsPerPage = (value) => {
   text-align: center;
 }
 
-/* Container do botão criar acima da tabela */
 .actions-top {
   display: flex;
   justify-content: flex-end;
@@ -228,4 +231,19 @@ const updateRowsPerPage = (value) => {
 .btn-excluir:hover {
   background-color: #e53e3e;
 }
+
+.search-box {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.input-pesquisa {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  width: 250px;
+}
+
 </style>

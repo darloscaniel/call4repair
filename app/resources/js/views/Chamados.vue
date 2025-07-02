@@ -1,6 +1,14 @@
 <template>
   <div class="chamados-container">
     <h2 class="titulo">🛠️ Chamados</h2>
+    <div class="search-box">
+  <input
+    type="text"
+    v-model="search"
+    placeholder="🔍 Pesquisar cliente..."
+    class="input-pesquisa"
+  />
+</div>
 
     <div class="table-wrapper">
 <EasyDataTable
@@ -269,5 +277,18 @@ onMounted(async () => {
   text-overflow: ellipsis;
 }
 
+.search-box {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.input-pesquisa {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  width: 250px;
+}
 
 </style>

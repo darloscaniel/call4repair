@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Call;
 
@@ -13,22 +12,17 @@ class CallSeeder extends Seeder
      */
     public function run(): void
     {
-       Call::insert([
-            [
-                'customer_name' => 'Ana Pereira',
-                'description' => 'Arranhão na porta traseira',
-                'status' => 'aberto',
-            ],
-            [
-                'customer_name' => 'Bruno Gomes',
-                'description' => 'Troca de para-choque',
-                'status' => 'em_andamento',
-            ],
-            [
-                'customer_name' => 'Carlos Martins',
-                'description' => 'Pintura do capô',
-                'status' => 'aberto',
-            ],
-        ]);
+        $calls = [
+            ['customer_name' => 'Ana Pereira',    'phone' => '11988880001', 'description' => 'Arranhão na porta traseira', 'status' => 'aberto'],
+            ['customer_name' => 'Bruno Gomes',    'phone' => '11988880002', 'description' => 'Troca de para-choque',       'status' => 'em_andamento'],
+            ['customer_name' => 'Carlos Martins', 'phone' => '11988880003', 'description' => 'Pintura do capô',            'status' => 'aberto'],
+        ];
+
+        foreach ($calls as $call) {
+            Call::firstOrCreate(
+                ['customer_name' => $call['customer_name']],
+                $call
+            );
+        }
     }
 }

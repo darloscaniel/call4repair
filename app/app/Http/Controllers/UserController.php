@@ -2,31 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
+use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required','email'],
-            'password' => ['required']
-        ]);
-
-        $user = User::where('email', $credentials['email'])->first();
+        $credentials = $request->validated();
 
         if (!$token = JWTAuth::attempt($credentials)) {
-        return response()->json(['message' => 'Credenciais inválidas'], 401);
-    }
-
-        // Aqui você pode gerar token, JWT ou sessão
+            return response()->json(['message' => 'Credenciais inválidas'], 401);
+        }
 
         return response()->json([
-            'token' => $token,
+            'token'   => $token,
             'message' => 'Login realizado com sucesso!',
-            'user' => $user,
+            'user'    => JWTAuth::user(),
         ]);
     }
 }

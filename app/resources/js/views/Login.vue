@@ -25,7 +25,7 @@
 
 <script setup>
 import { ref, onBeforeMount } from 'vue'
-import axios from 'axios'
+import api from '../api'
 import { useRouter } from 'vue-router'
 
 const email = ref('')
@@ -44,7 +44,7 @@ onBeforeMount(() => {
 const login = async () => {
   error.value = null
   try {
-    const response = await axios.post('http://localhost:8080/api/login', {
+    const response = await api.post('/login', {
       email: email.value,
       password: password.value
     })

@@ -56,6 +56,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '../api'
 
 const router = useRouter()
 const form = ref({
@@ -74,22 +75,17 @@ const submitChamado = async () => {
       status: form.value.status,
     }
 
-    const response = await fetch('http://localhost:8080/api/calls', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    })
-
-    if (!response.ok) throw new Error('Erro ao criar chamado')
+    await api.post('/calls', payload)
 
     alert('Chamado criado com sucesso!')
-    form.value = { nome: '', descricao: '', status: 'aberto' }
+    form.value = { nome: '', telefone: '', descricao: '', status: 'aberto' }
   } catch (error) {
     console.error('Erro ao criar chamado:', error)
-    alert('Erro ao criar chamado. Tente novamente.')
+    if (error.response && error.response.status === 429) {
+      alert('Muitas tentativas. Aguarde um minuto e tente novamente.')
+    } else {
+      alert('Erro ao criar chamado. Tente novamente.')
+    }
   }
 }
 </script>

@@ -12,4 +12,18 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+// Sessão expirada / token inválido: limpa o token e volta ao login.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      sessionStorage.removeItem('token')
+      if (window.location.pathname !== '/login') {
+        window.location.assign('/login')
+      }
+    }
+    return Promise.reject(error)
+  }
+)
+
 export default api;

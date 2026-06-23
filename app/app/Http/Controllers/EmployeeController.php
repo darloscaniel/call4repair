@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
+use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class EmployeeController extends Controller
 {
     // Lista todos os funcionários
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        // Opcional: carregar chamados relacionados, caso queira
-        // return response()->json(Employee::with('calls')->get());
-
-        return response()->json(Employee::all());
+        return EmployeeResource::collection(Employee::all());
     }
 
     // Mostra um funcionário específico
-    public function show($id)
+    public function show($id): EmployeeResource|JsonResponse
     {
         $employee = Employee::find($id);
 
@@ -25,26 +26,21 @@ class EmployeeController extends Controller
             return response()->json(['message' => 'Funcionário não encontrado.'], 404);
         }
 
-        return response()->json($employee);
+        return new EmployeeResource($employee);
     }
 
     // Cria um novo funcionário
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name'  => 'required|string|max:255',
-            'age'   => 'required|integer|min:0',
-            'phone' => 'required|string|max:20',
-            'email' => 'required|email|unique:employees,email',
-        ]);
+        $employee = Employee::create($request->validated());
 
-        $employee = Employee::create($validated);
-
-        return response()->json($employee, 201);
+        return (new EmployeeResource($employee))
+            ->response()
+            ->setStatusCode(201);
     }
 
     // Atualiza um funcionário existente
-    public function update(Request $request, $id)
+    public function update(UpdateEmployeeRequest $request, $id): EmployeeResource|JsonResponse
     {
         $employee = Employee::find($id);
 
@@ -52,20 +48,13 @@ class EmployeeController extends Controller
             return response()->json(['message' => 'Funcionário não encontrado.'], 404);
         }
 
-        $validated = $request->validate([
-            'name'  => 'sometimes|required|string|max:255',
-            'age'   => 'sometimes|required|integer|min:0',
-            'phone' => 'sometimes|required|string|max:20',
-            'email' => "sometimes|required|email|unique:employees,email,$id",
-        ]);
+        $employee->update($request->validated());
 
-        $employee->update($validated);
-
-        return response()->json($employee);
+        return new EmployeeResource($employee);
     }
 
     // Deleta um funcionário
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         $employee = Employee::find($id);
 

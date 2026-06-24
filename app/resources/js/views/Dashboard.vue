@@ -32,7 +32,7 @@
 
     <!-- Charts -->
     <div class="charts-grid">
-      <div class="chart-card">
+      <div class="chart-card chart-card--status">
         <h3 class="chart-card__title">{{ t('dashboard.chartStatus') }}</h3>
         <div class="chart-canvas">
           <Doughnut v-if="hasCalls" :data="statusChart" :options="doughnutOptions" />
@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div class="chart-card">
+      <div class="chart-card chart-card--perday">
         <h3 class="chart-card__title">{{ t('dashboard.chartPerDay') }}</h3>
         <div class="chart-canvas">
           <Bar :data="perDayChart" :options="barOptions" />
@@ -97,15 +97,24 @@ import { isAuthenticated, can } from '../auth'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement)
 
+// Match the app typography and muted text colour used across the design system.
+ChartJS.defaults.font.family = "'Inter', system-ui, -apple-system, sans-serif"
+ChartJS.defaults.font.size = 12
+ChartJS.defaults.color = '#6b7280'
+
 const router = useRouter()
 const { t } = useI18n()
 
+// Status colours aligned with the badge tokens (info/warning/success/danger).
 const STATUS_COLORS = {
-  open: '#8b5cf6',
-  in_progress: '#f59e0b',
-  done: '#22c55e',
-  rejected: '#ef4444',
+  open: '#7c3aed',
+  in_progress: '#d97706',
+  done: '#16a34a',
+  rejected: '#dc2626',
 }
+
+// Subtle grid lines matching the theme border colour.
+const GRID = '#eef1f6'
 
 const stats = ref({
   totals: { calls: 0, open: 0, employees: null },
@@ -175,8 +184,13 @@ const barOptions = {
   maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: { grid: { display: false } },
-    y: { beginAtZero: true, ticks: { precision: 0 } },
+    x: { grid: { display: false }, border: { display: false } },
+    y: {
+      beginAtZero: true,
+      ticks: { precision: 0 },
+      grid: { color: GRID },
+      border: { display: false },
+    },
   },
 }
 
@@ -186,7 +200,13 @@ const horizontalBarOptions = {
   maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { display: false } },
+    x: {
+      beginAtZero: true,
+      ticks: { precision: 0 },
+      grid: { color: GRID },
+      border: { display: false },
+    },
+    y: { grid: { display: false }, border: { display: false } },
   },
 }
 
@@ -261,7 +281,7 @@ onMounted(() => {
 /* Charts */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
   margin-bottom: 1.75rem;
 }
@@ -273,8 +293,22 @@ onMounted(() => {
   box-shadow: var(--shadow-sm);
   padding: 1.25rem 1.4rem;
 }
-.chart-card--wide {
-  grid-column: 1 / -1;
+
+/* Asymmetric layout: compact doughnut beside a wider time series,
+   full-width workload bar underneath. */
+.chart-card--status { grid-column: span 1; }
+.chart-card--perday { grid-column: span 2; }
+.chart-card--wide   { grid-column: 1 / -1; }
+
+@media (max-width: 980px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .chart-card--status,
+  .chart-card--perday,
+  .chart-card--wide {
+    grid-column: auto;
+  }
 }
 
 .chart-card__title {

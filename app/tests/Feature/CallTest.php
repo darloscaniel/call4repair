@@ -94,7 +94,7 @@ class CallTest extends TestCase
         $this->withHeaders($this->authHeaders('technician'))
             ->getJson('/api/calls')
             ->assertOk()
-            ->assertJsonCount(2);
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_authenticated_user_can_list_calls_with_employees(): void
@@ -106,8 +106,9 @@ class CallTest extends TestCase
         $this->withHeaders($this->authHeaders())
             ->getJson('/api/calls')
             ->assertOk()
-            ->assertJsonCount(1)
-            ->assertJsonPath('0.employees.0.id', $employee->id);
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.employees.0.id', $employee->id)
+            ->assertJsonStructure(['data', 'meta' => ['total', 'current_page', 'per_page']]);
     }
 
     public function test_update_syncs_employees(): void

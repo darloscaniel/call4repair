@@ -12,7 +12,8 @@
 
     <div class="table-wrapper">
       <EasyDataTable
-        v-if="!loading"
+        v-model:server-options="serverOptions"
+        :server-items-length="totalItems"
         :headers="headers"
         :items="processedCalls"
         theme-color="#2d89ef"
@@ -20,10 +21,8 @@
         header-text-direction="center"
         body-text-direction="center"
         alternating
-        :rows-per-page="25"
         show-index
         :loading="loading"
-        :search-value="search"
         @click-row="openModal"
       >
         <template #item-status="{ status }">
@@ -62,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import EasyDataTable from 'vue3-easy-data-table'
@@ -79,6 +78,9 @@ const search = ref('')
 const showModal = ref(false)
 const selectedCall = ref({})
 const allEmployees = ref([])
+
+const totalItems = ref(0)
+const serverOptions = ref({ page: 1, rowsPerPage: 25, sortBy: '', sortType: '' })
 
 const processedCalls = computed(() => {
   return calls.value.map((call) => ({
@@ -109,50 +111,65 @@ const openModal = (row) => {
   showModal.value = true
 }
 
+const loadCalls = async () => {
+  loading.value = true
+  try {
+    const { data } = await api.get('/calls', {
+      params: {
+        page: serverOptions.value.page,
+        per_page: serverOptions.value.rowsPerPage,
+        search: search.value || undefined,
+      },
+    })
+    calls.value = data.data
+    totalItems.value = data.meta.total
+  } catch (err) {
+    console.error('Error loading calls:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
 const handleSave = async (updated) => {
   try {
-    const response = await api.put(`/calls/${updated.id}`, {
+    await api.put(`/calls/${updated.id}`, {
       status: updated.status,
       employees: updated.employees.map((e) => e.id),
     })
-    const updatedData = response.data
-
-    calls.value = calls.value.map((call) =>
-      call.id === updatedData.id ? updatedData : call
-    )
-
     showModal.value = false
+    await loadCalls()
   } catch (err) {
     console.error('Error saving call:', err)
   }
 }
 
+// Refetch on page/rows-per-page change (server-side pagination).
+watch(serverOptions, loadCalls, { deep: true })
+
+// Server-side search by customer name.
+watch(search, () => {
+  serverOptions.value.page = 1
+  loadCalls()
+})
+
 onMounted(async () => {
-  try {
-    if (!isAuthenticated()) {
-      router.push('/login')
-      return
-    }
-
-    // Employee list (for assignment) is only available to users who can
-    // manage employees; technicians simply get an empty assignable list.
-    if (can('manage employees')) {
-      const { data: employeesData } = await api.get('/employees')
-      allEmployees.value = employeesData
-    }
-
-    const { data } = await api.get('/calls')
-    calls.value = data.map((item) => ({
-      ...item,
-      employees: item.employees || [],
-    }))
-  } catch (error) {
-    console.error('Error loading calls:', error)
-    sessionStorage.removeItem('token')
+  if (!isAuthenticated()) {
     router.push('/login')
-  } finally {
-    loading.value = false
+    return
   }
+
+  // Employee list (for assignment) is only available to users who can manage
+  // employees; technicians simply get an empty assignable list.
+  if (can('manage employees')) {
+    try {
+      const { data } = await api.get('/employees', { params: { per_page: 100 } })
+      allEmployees.value = data.data
+    } catch (err) {
+      console.error('Error loading employees:', err)
+    }
+  }
+
+  await loadCalls()
 })
 </script>
 

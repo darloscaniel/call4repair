@@ -6,15 +6,25 @@ use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class EmployeeController extends Controller
 {
-    // List all employees
-    public function index(): AnonymousResourceCollection
+    // Paginated list of employees
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return EmployeeResource::collection(Employee::all());
+        $perPage = min(max($request->integer('per_page', 25), 1), 100);
+
+        $query = Employee::latest('id');
+
+        if ($search = trim((string) $request->query('search', ''))) {
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+        }
+
+        return EmployeeResource::collection($query->paginate($perPage));
     }
 
     // Show a single employee

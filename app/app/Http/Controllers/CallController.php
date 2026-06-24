@@ -6,16 +6,25 @@ use App\Http\Requests\StoreCallRequest;
 use App\Http\Requests\UpdateCallRequest;
 use App\Http\Resources\CallResource;
 use App\Models\Call;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class CallController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        // Return all calls with their related employees
-        return CallResource::collection(Call::with('employees')->get());
+        // Paginated list of calls with their related employees
+        $perPage = min(max($request->integer('per_page', 25), 1), 100);
+
+        $query = Call::with('employees')->latest('id');
+
+        if ($search = trim((string) $request->query('search', ''))) {
+            $query->where('customer_name', 'like', "%{$search}%");
+        }
+
+        return CallResource::collection($query->paginate($perPage));
     }
 
     public function store(StoreCallRequest $request): JsonResponse

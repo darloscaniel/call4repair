@@ -51,7 +51,20 @@ class EmployeeTest extends TestCase
         $this->withHeaders($this->authHeaders())
             ->getJson('/api/employees')
             ->assertOk()
-            ->assertJsonCount(3);
+            ->assertJsonCount(3, 'data')
+            ->assertJsonStructure(['data', 'meta' => ['total', 'current_page', 'per_page']]);
+    }
+
+    public function test_employees_listing_is_searchable(): void
+    {
+        Employee::factory()->create(['name' => 'Findable Person']);
+        Employee::factory()->count(2)->create();
+
+        $this->withHeaders($this->authHeaders())
+            ->getJson('/api/employees?search=Findable')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.name', 'Findable Person');
     }
 
     public function test_can_create_employee(): void

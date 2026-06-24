@@ -24,17 +24,16 @@
 
     <div class="table-wrapper">
       <EasyDataTable
+        v-model:server-options="serverOptions"
+        :server-items-length="totalItems"
         :headers="headers"
         :items="employees"
         :loading="loading"
-        :search-value="search"
         theme-color="#2d89ef"
         table-class-name="customize-table"
         header-text-direction="center"
         body-text-direction="center"
         alternating
-        :rows-per-page="rowsPerPage"
-        @update:rows-per-page="updateRowsPerPage"
         show-index
       >
         <template #item-actions="{ id }">
@@ -59,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import '@fortawesome/fontawesome-free/css/all.css'
@@ -75,8 +74,9 @@ const selectedEmployee = ref(null)
 const employees = ref([])
 const loading = ref(true)
 const search = ref('')
-const error = ref(null)
-const rowsPerPage = ref(25)
+
+const totalItems = ref(0)
+const serverOptions = ref({ page: 1, rowsPerPage: 25, sortBy: '', sortType: '' })
 
 const headers = [
   { text: t('employees.name'), value: 'name' },
@@ -84,6 +84,36 @@ const headers = [
   { text: t('employees.phone'), value: 'phone', width: 150 },
   { text: t('employees.actions'), value: 'actions', width: 200 },
 ]
+
+const loadEmployees = async () => {
+  loading.value = true
+  try {
+    const { data } = await api.get('/employees', {
+      params: {
+        page: serverOptions.value.page,
+        per_page: serverOptions.value.rowsPerPage,
+        search: search.value || undefined,
+      },
+    })
+    employees.value = data.data
+    totalItems.value = data.meta.total
+  } catch (err) {
+    console.error('Error loading employees:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Refetch when the page/rows-per-page change (server-side pagination).
+watch(serverOptions, loadEmployees, { deep: true })
+
+// Server-side search: reset to the first page and refetch.
+watch(search, () => {
+  serverOptions.value.page = 1
+  loadEmployees()
+})
+
+onMounted(loadEmployees)
 
 const createEmployee = () => {
   selectedEmployee.value = { name: '', age: '', phone: '', email: '' }
@@ -101,13 +131,11 @@ const edit = (id) => {
 const handleSave = async (employee) => {
   try {
     if (employee.id) {
-      const response = await api.put(`/employees/${employee.id}`, employee)
-      const updated = response.data
-      employees.value = employees.value.map((e) => (e.id === updated.id ? updated : e))
+      await api.put(`/employees/${employee.id}`, employee)
     } else {
-      const response = await api.post('/employees', employee)
-      employees.value.push(response.data)
+      await api.post('/employees', employee)
     }
+    await loadEmployees()
   } catch (err) {
     console.error('Error saving employee:', err)
   } finally {
@@ -120,31 +148,15 @@ const closeModal = () => {
   showEditModal.value = false
 }
 
-onMounted(async () => {
-  try {
-    const { data } = await api.get('/employees')
-    employees.value = data
-  } catch (err) {
-    error.value = 'Error loading employees.'
-    console.error(err)
-  } finally {
-    loading.value = false
-  }
-})
-
 const remove = async (id) => {
   if (confirm(t('employees.confirmDelete'))) {
     try {
       await api.delete(`/employees/${id}`)
-      employees.value = employees.value.filter((e) => e.id !== id)
+      await loadEmployees()
     } catch (err) {
       console.error('Error deleting employee:', err)
     }
   }
-}
-
-const updateRowsPerPage = (value) => {
-  rowsPerPage.value = value
 }
 </script>
 

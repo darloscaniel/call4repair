@@ -15,7 +15,8 @@ class RoleSeeder extends Seeder
     {
         $permissions = [
             'manage employees', // create/update/delete employees
-            'view calls',
+            'view calls',       // view calls (scoped to assigned ones by default)
+            'view all calls',   // view every call, not just the assigned ones
             'manage calls',     // create/update calls
             'delete calls',
         ];
@@ -26,7 +27,8 @@ class RoleSeeder extends Seeder
 
         $roles = [
             'admin'      => $permissions, // full access
-            'manager'    => ['manage employees', 'view calls', 'manage calls'],
+            'manager'    => ['manage employees', 'view calls', 'view all calls', 'manage calls'],
+            // Technicians only see the calls assigned to them (no "view all calls").
             'technician' => ['view calls', 'manage calls'],
         ];
 

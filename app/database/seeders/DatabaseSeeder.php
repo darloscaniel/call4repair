@@ -13,8 +13,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
-            UserSeeder::class,
+            // Employees before users so the technician account can be linked
+            // to an existing employee record.
             EmployeeSeeder::class,
+            UserSeeder::class,
             CallSeeder::class,
             CallEmployeeSeeder::class,
         ]);

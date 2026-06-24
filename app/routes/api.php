@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CallController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\StatsController;
 use App\Http\Controllers\UserController;
 
 // Login is throttled per IP to slow down brute-force attempts.
@@ -15,6 +16,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('me', [UserController::class, 'me']);
     Route::post('refresh', [UserController::class, 'refresh']);
     Route::post('logout', [UserController::class, 'logout']);
+
+    Route::get('stats', [StatsController::class, 'index'])->middleware('permission:view calls');
 
     Route::get('calls', [CallController::class, 'index'])->middleware('permission:view calls');
     Route::get('calls/{call}', [CallController::class, 'show'])->middleware('permission:view calls');

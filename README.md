@@ -37,13 +37,20 @@ docker compose exec app php artisan migrate --seed
 | Vite dev server | http://localhost:5174 |
 | Health check | http://localhost:8080/up |
 
-### Credencial de acesso (seed)
+### Credenciais de acesso (seed)
 
-- **Email:** `test@example.com`
-- **Senha:** `password` — papel **admin**
+| Papel | Email | Senha |
+|---|---|---|
+| **admin** | `test@example.com` | `password` |
+| **technician** | `joao@empresa.com` | `password` |
 
 Papéis e permissões (`RoleSeeder`): `admin` (tudo), `manager` (gerenciar
-funcionários + chamados), `technician` (ver/gerenciar chamados).
+funcionários + chamados, vê todos os chamados), `technician` (vê/gerencia
+**apenas os chamados atribuídos a ele**).
+
+> O técnico `joao@empresa.com` está vinculado ao funcionário João Silva
+> (`employees.user_id`), então enxerga só os chamados onde esse funcionário
+> está atribuído.
 
 ## Endpoints da API (prefixo `/api`)
 
@@ -54,7 +61,8 @@ funcionários + chamados), `technician` (ver/gerenciar chamados).
 | GET | `/me` | auth | Usuário autenticado + papéis/permissões |
 | POST | `/refresh` | auth | Renova o token (rotaciona o cookie) |
 | POST | `/logout` | auth | Invalida o token (blacklist) e limpa os cookies |
-| GET | `/calls` | `view calls` | Lista chamados paginada (`?page`, `?per_page`, `?search`) |
+| GET | `/stats` | `view calls` | Métricas para os gráficos do painel (escopadas por visibilidade) |
+| GET | `/calls` | `view calls` | Lista chamados paginada (`?page`, `?per_page`, `?search`) — escopada ao usuário |
 | GET | `/calls/{id}` | `view calls` | Detalhe do chamado |
 | PUT | `/calls/{id}` | `manage calls` | Atualiza chamado / sincroniza funcionários |
 | DELETE | `/calls/{id}` | `delete calls` | Remove chamado |
@@ -76,6 +84,10 @@ automaticamente a partir do cookie `XSRF-TOKEN`). Clientes não-browser podem us
   mantida (`deleted_at`) e some das listagens, preservando o histórico de atribuições.
 - **Autoria do chamado:** chamados abertos por um usuário autenticado registram
   `created_by`; o formulário público anônimo deixa o campo `null`.
+- **Visibilidade dos chamados:** quem tem `view all calls` (admin/manager) vê
+  todos os chamados; os demais (técnico) veem **apenas os atribuídos a si**
+  (via `employees.user_id`). Vale para listagem, detalhe e edição (`/stats`
+  também é escopado). Reatribuir funcionários exige `manage employees`.
 - **Rate limit:** `POST /login` e `POST /calls` são limitados a 5/min por IP.
 - **Painel:** após o login o usuário cai em `/dashboard`, que reúne os atalhos de
   gestão (chamados e, para quem tem `manage employees`, funcionários).

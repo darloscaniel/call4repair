@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
@@ -29,6 +30,15 @@ class Employee extends Model
         return $this->belongsToMany(Call::class, 'call_employee')
                     ->withPivot('assigned_at', 'status')
                     ->withTimestamps();
+    }
+
+    /**
+     * Login account tied to this employee (null when the employee has no
+     * access to the system). Not mass-assignable on purpose.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
 

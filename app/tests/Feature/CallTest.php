@@ -25,11 +25,20 @@ class CallTest extends TestCase
 
     private function authHeaders(string|array $roles = 'admin'): array
     {
+        return $this->tokenFor($this->userWithRole($roles));
+    }
+
+    private function userWithRole(string|array $roles): User
+    {
         $user = User::factory()->create();
         $user->syncRoles($roles);
-        $token = JWTAuth::fromUser($user);
 
-        return ['Authorization' => "Bearer {$token}"];
+        return $user;
+    }
+
+    private function tokenFor(User $user): array
+    {
+        return ['Authorization' => 'Bearer ' . JWTAuth::fromUser($user)];
     }
 
     private function validPayload(array $overrides = []): array
@@ -87,14 +96,41 @@ class CallTest extends TestCase
         $this->assertDatabaseHas('calls', ['id' => $call->id]);
     }
 
-    public function test_technician_can_view_calls(): void
+    public function test_technician_sees_only_assigned_calls(): void
     {
-        Call::factory()->count(2)->create();
+        $tech = $this->userWithRole('technician');
+        $employee = Employee::factory()->create(['user_id' => $tech->id]);
 
-        $this->withHeaders($this->authHeaders('technician'))
+        $assigned = Call::factory()->create();
+        $assigned->employees()->attach($employee->id);
+        Call::factory()->count(2)->create(); // not assigned to this technician
+
+        $this->withHeaders($this->tokenFor($tech))
             ->getJson('/api/calls')
             ->assertOk()
-            ->assertJsonCount(2, 'data');
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $assigned->id);
+    }
+
+    public function test_technician_cannot_view_unassigned_call(): void
+    {
+        $tech = $this->userWithRole('technician');
+        Employee::factory()->create(['user_id' => $tech->id]);
+        $other = Call::factory()->create();
+
+        $this->withHeaders($this->tokenFor($tech))
+            ->getJson("/api/calls/{$other->id}")
+            ->assertStatus(403);
+    }
+
+    public function test_admin_sees_all_calls(): void
+    {
+        Call::factory()->count(3)->create();
+
+        $this->withHeaders($this->authHeaders('admin'))
+            ->getJson('/api/calls')
+            ->assertOk()
+            ->assertJsonCount(3, 'data');
     }
 
     public function test_authenticated_user_can_list_calls_with_employees(): void

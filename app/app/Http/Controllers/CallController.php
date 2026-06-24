@@ -15,10 +15,11 @@ class CallController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        // Paginated list of calls with their related employees
+        // Paginated list of calls with their related employees, scoped to what
+        // the current user is allowed to see (technicians: only assigned calls).
         $perPage = min(max($request->integer('per_page', 25), 1), 100);
 
-        $query = Call::with('employees')->latest('id');
+        $query = Call::with('employees')->visibleTo($request->user())->latest('id');
 
         if ($search = trim((string) $request->query('search', ''))) {
             $query->where('customer_name', 'like', "%{$search}%");
@@ -49,13 +50,17 @@ class CallController extends Controller
             ->setStatusCode(201);
     }
 
-    public function show(Call $call): CallResource
+    public function show(Request $request, Call $call): CallResource
     {
+        abort_unless($call->isVisibleTo($request->user()), 403);
+
         return new CallResource($call->load('employees'));
     }
 
     public function update(UpdateCallRequest $request, Call $call): CallResource
     {
+        abort_unless($call->isVisibleTo($request->user()), 403);
+
         $validated = $request->validated();
 
         $call->update(collect($validated)->except('employees')->toArray());

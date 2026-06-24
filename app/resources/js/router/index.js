@@ -3,6 +3,7 @@ import Employees from '../views/Employees.vue'
 import Calls from '../views/Calls.vue'
 import Login from '../views/Login.vue'
 import PublicCallForm from '../views/PublicCallForm.vue'
+import { isAuthenticated } from '../auth'
 
 const publicPages = ['/login', '/new-call']
 
@@ -21,9 +22,8 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path)
-  const loggedIn = sessionStorage.getItem('token')
 
-  if (authRequired && !loggedIn) {
+  if (authRequired && !isAuthenticated()) {
     return next('/login')
   }
 

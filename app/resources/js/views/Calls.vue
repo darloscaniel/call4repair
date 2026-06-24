@@ -69,6 +69,7 @@ import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import api from '../api'
 import CallModal from '@/components/CallModal.vue'
+import { isAuthenticated, can } from '../auth'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -128,14 +129,17 @@ const handleSave = async (updated) => {
 
 onMounted(async () => {
   try {
-    const token = sessionStorage.getItem('token')
-    if (!token) {
+    if (!isAuthenticated()) {
       router.push('/login')
       return
     }
 
-    const { data: employeesData } = await api.get('/employees')
-    allEmployees.value = employeesData
+    // Employee list (for assignment) is only available to users who can
+    // manage employees; technicians simply get an empty assignable list.
+    if (can('manage employees')) {
+      const { data: employeesData } = await api.get('/employees')
+      allEmployees.value = employeesData
+    }
 
     const { data } = await api.get('/calls')
     calls.value = data.map((item) => ({

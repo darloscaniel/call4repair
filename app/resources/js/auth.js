@@ -1,14 +1,16 @@
 // Lightweight client-side auth/permission helpers backed by sessionStorage.
+// The JWT lives in an httpOnly cookie (not readable by JS); sessionStorage only
+// holds non-sensitive UI state (roles/permissions) and an "authenticated" flag.
 // Authorization is always enforced server-side; this only drives UI visibility.
 
-export function setAuth({ token, roles, permissions }) {
-  sessionStorage.setItem('token', token)
+export function setAuth({ roles, permissions }) {
+  sessionStorage.setItem('authenticated', '1')
   sessionStorage.setItem('roles', JSON.stringify(roles || []))
   sessionStorage.setItem('permissions', JSON.stringify(permissions || []))
 }
 
 export function clearAuth() {
-  sessionStorage.removeItem('token')
+  sessionStorage.removeItem('authenticated')
   sessionStorage.removeItem('roles')
   sessionStorage.removeItem('permissions')
 }
@@ -26,5 +28,5 @@ export function can(permission) {
 }
 
 export function isAuthenticated() {
-  return !!sessionStorage.getItem('token')
+  return sessionStorage.getItem('authenticated') === '1'
 }

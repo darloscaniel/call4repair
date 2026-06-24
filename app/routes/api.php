@@ -11,6 +11,10 @@ Route::post('login', [UserController::class, 'login']);
 Route::post('calls', [CallController::class, 'store'])->middleware('throttle:calls');
 
 Route::middleware('auth:api')->group(function () {
+    Route::get('me', [UserController::class, 'me']);
+    Route::post('refresh', [UserController::class, 'refresh']);
+    Route::post('logout', [UserController::class, 'logout']);
+
     Route::get('calls', [CallController::class, 'index'])->middleware('permission:view calls');
     Route::get('calls/{call}', [CallController::class, 'show'])->middleware('permission:view calls');
     Route::put('calls/{call}', [CallController::class, 'update'])->middleware('permission:manage calls');

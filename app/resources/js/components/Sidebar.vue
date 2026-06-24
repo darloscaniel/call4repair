@@ -28,14 +28,22 @@
 <script setup>
 import { useRouter, RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import api from '../api'
 import { can, clearAuth } from '../auth'
 
 const router = useRouter()
 const { t } = useI18n()
 
-const logout = () => {
-  clearAuth()
-  router.push('/login')
+const logout = async () => {
+  try {
+    // Invalidate the token server-side (blacklist) and clear auth cookies.
+    await api.post('/logout')
+  } catch {
+    // Ignore network/credential errors; we still clear local state below.
+  } finally {
+    clearAuth()
+    router.push('/login')
+  }
 }
 </script>
 

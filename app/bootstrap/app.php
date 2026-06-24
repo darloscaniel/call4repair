@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust the reverse proxy (nginx) so HTTPS is detected behind it,
+        // which keeps Secure cookies and generated URLs correct in production.
+        $middleware->trustProxies(at: '*');
+
         $middleware->api(prepend: [
             \App\Http\Middleware\ForceJsonAccept::class,
         ]);

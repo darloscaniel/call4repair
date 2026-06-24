@@ -1,69 +1,81 @@
 <template>
-  <h2 class="title">{{ t('publicForm.title') }}</h2>
-  <div class="form-container">
-
-    <h2>{{ t('publicForm.heading') }}</h2>
-    <form @submit.prevent="submitCall">
-      <div class="form-group">
-        <label for="name">{{ t('publicForm.name') }}</label>
-        <input
-          type="text"
-          id="name"
-          v-model="form.name"
-          required
-          :placeholder="t('publicForm.namePlaceholder')"
-        />
+  <div class="public-container">
+    <div class="public-card">
+      <div class="public-brand">
+        <span class="public-brand__logo">🔧</span>
+        <span class="public-brand__name">{{ t('app.title') }}</span>
       </div>
+      <h2 class="public-heading">{{ t('publicForm.heading') }}</h2>
 
-      <div class="form-group">
-        <label for="phone">{{ t('publicForm.phone') }}</label>
-        <input
-          type="text"
-          id="phone"
-          v-model="form.phone"
-          required
-          :placeholder="t('publicForm.phonePlaceholder')"
-        />
-      </div>
+      <form @submit.prevent="submitCall">
+        <div class="field">
+          <label for="name">{{ t('publicForm.name') }}</label>
+          <input
+            class="input"
+            type="text"
+            id="name"
+            v-model="form.name"
+            required
+            :placeholder="t('publicForm.namePlaceholder')"
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="description">{{ t('publicForm.description') }}</label>
-        <textarea
-          id="description"
-          v-model="form.description"
-          required
-          :placeholder="t('publicForm.descriptionPlaceholder')"
-          rows="5"
-        ></textarea>
-      </div>
+        <div class="field">
+          <label for="phone">{{ t('publicForm.phone') }}</label>
+          <input
+            class="input"
+            type="text"
+            id="phone"
+            v-model="form.phone"
+            required
+            :placeholder="t('publicForm.phonePlaceholder')"
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="status">{{ t('publicForm.status') }}</label>
-        <input
-          type="text"
-          id="status"
-          :value="t('status.open')"
-          readonly
-        />
-      </div>
+        <div class="field">
+          <label for="description">{{ t('publicForm.description') }}</label>
+          <textarea
+            class="textarea"
+            id="description"
+            v-model="form.description"
+            required
+            :placeholder="t('publicForm.descriptionPlaceholder')"
+            rows="5"
+          ></textarea>
+        </div>
 
-      <button type="submit" class="submit-btn">{{ t('publicForm.submit') }}</button>
-    </form>
+        <div class="field">
+          <label for="status">{{ t('publicForm.status') }}</label>
+          <input class="input" type="text" id="status" :value="t('status.open')" readonly />
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--block">{{ t('publicForm.submit') }}</button>
+        <button type="button" class="btn btn--ghost btn--block back-btn" @click="goToLogin">
+          {{ t('publicForm.back') }}
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import api from '../api'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const form = ref({
   name: '',
   phone: '',
   description: '',
 })
+
+const goToLogin = () => {
+  router.push('/login')
+}
 
 const submitCall = async () => {
   try {
@@ -90,76 +102,54 @@ const submitCall = async () => {
 </script>
 
 <style scoped>
-.form-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 30px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.public-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(900px 500px at 100% 0%, rgba(45, 137, 239, .10), transparent 60%),
+    var(--c-bg);
+  padding: 2.5rem 1.5rem;
+  overflow-y: auto;
 }
 
-h2 {
+.public-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 560px;
+  padding: 2.25rem;
+}
+
+.public-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 0.4rem;
+}
+.public-brand__logo {
+  font-size: 1.6rem;
+}
+.public-brand__name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.public-heading {
+  margin: 0 0 1.75rem;
   text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-  font-size: 28px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--c-text-muted);
 }
 
-.form-group {
-  margin-bottom: 25px;
-  width: 95%;
-}
-
-label {
-  display: block;
-  margin-bottom: 10px;
-  font-weight: bold;
-  font-size: 18px;
-  color: #444;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 15px;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border 0.3s;
-}
-
-input:focus,
-textarea:focus {
-  border-color: #4CAF50;
-  outline: none;
-}
-
-textarea {
-  min-height: 150px;
-}
-
-input[readonly] {
-  background-color: #f9f9f9;
-  cursor: not-allowed;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 15px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-top: 10px;
-}
-
-.submit-btn:hover {
-  background-color: #45a049;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.back-btn {
+  margin-top: 0.7rem;
 }
 </style>

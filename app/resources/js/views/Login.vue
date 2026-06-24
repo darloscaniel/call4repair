@@ -1,22 +1,26 @@
 <template>
   <div class="login-container">
-    <form @submit.prevent="login" class="login-form">
-      <h2 class="title">{{ t('login.title') }}</h2>
+    <form @submit.prevent="login" class="login-card">
+      <div class="login-brand">
+        <span class="login-brand__logo">🔧</span>
+        <span class="login-brand__name">Call4Repair</span>
+      </div>
+      <h2 class="login-title">{{ t('login.title') }}</h2>
 
-      <div class="form-group">
+      <div class="field">
         <label for="email">{{ t('login.email') }}</label>
-        <input v-model="email" type="email" id="email" required />
+        <input class="input" v-model="email" type="email" id="email" required />
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label for="password">{{ t('login.password') }}</label>
-        <input v-model="password" type="password" id="password" required />
+        <input class="input" v-model="password" type="password" id="password" required />
       </div>
 
       <div v-if="error" class="error-message">{{ error }}</div>
 
-      <button type="submit">{{ t('login.submit') }}</button>
-      <button type="button" @click="goToPublicForm" class="public-form-btn">
+      <button type="submit" class="btn btn--primary btn--block">{{ t('login.submit') }}</button>
+      <button type="button" @click="goToPublicForm" class="btn btn--ghost btn--block public-btn">
         {{ t('login.openCall') }}
       </button>
     </form>
@@ -64,84 +68,65 @@ const login = async () => {
 }
 </script>
 
-
-
 <style scoped>
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: #f5f7fa;
+  min-height: 100vh;
+  width: 100%;
+  background:
+    radial-gradient(900px 500px at 100% 0%, rgba(45, 137, 239, .10), transparent 60%),
+    radial-gradient(700px 500px at 0% 100%, rgba(109, 40, 217, .08), transparent 55%),
+    var(--c-bg);
+  padding: 1.5rem;
 }
 
-.login-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+.login-card {
+  background: var(--c-surface);
+  padding: 2.25rem;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 400px;
 }
 
-.title {
-  margin-bottom: 1.5rem;
+.login-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 0.5rem;
+}
+.login-brand__logo {
+  font-size: 1.6rem;
+}
+.login-brand__name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.login-title {
+  margin: 0 0 1.75rem;
   text-align: center;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-}
-
-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #2d89ef;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #2267c5;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--c-text-muted);
 }
 
 .error-message {
-  color: red;
+  background: var(--c-danger-bg);
+  color: var(--c-danger);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.8rem;
   margin-bottom: 1rem;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   text-align: center;
 }
 
-.public-form-btn {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #05a100;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 2%;
+.public-btn {
+  margin-top: 0.7rem;
 }
-
-.public-form-btn:hover {
-  background-color: #3e8e41;
-}
-
 </style>

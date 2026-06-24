@@ -1,6 +1,9 @@
 <template>
   <aside class="sidebar">
-    <h1 class="title">{{ t('app.title') }}</h1>
+    <div class="brand">
+      <span class="brand__logo">🔧</span>
+      <span class="brand__name">{{ t('app.title') }}</span>
+    </div>
 
     <nav class="menu">
       <RouterLink
@@ -55,64 +58,88 @@ const logout = async () => {
 
 <style scoped>
 .sidebar {
-  width: 17%;
-  background-color: #1a202c;
-  color: white;
+  width: 250px;
+  flex-shrink: 0;
+  background: var(--c-sidebar);
+  color: var(--c-sidebar-text);
   height: 100vh;
-  padding: 24px;
+  padding: 22px 16px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
 }
 
-.title {
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 22px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--c-sidebar-2);
+}
+
+.brand__logo {
   font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 32px;
+}
+
+.brand__name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
 }
 
 .menu {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 6px;
 }
 
 .menu-link {
   display: block;
-  padding: 8px 16px;
-  border-radius: 6px;
-  color: white;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--c-sidebar-text);
+  font-size: 0.95rem;
+  font-weight: 500;
   text-decoration: none;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .menu-link:hover {
-  background-color: #4a5568;
+  background-color: var(--c-sidebar-2);
+  color: #fff;
 }
 
 .menu-link.active {
-  background-color: #2d3748;
-  font-weight: bold;
+  background-color: var(--c-primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
 }
 
 .logout-container {
   margin-top: auto;
+  padding-top: 16px;
 }
 
 .logout-button {
-  background-color: #e53e3e;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
   width: 100%;
+  padding: 11px 16px;
+  background-color: transparent;
+  color: #fca5a5;
+  border: 1px solid var(--c-sidebar-2);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
   font-weight: 600;
-  transition: background-color 0.2s ease;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .logout-button:hover {
-  background-color: #c53030;
+  background-color: rgba(220, 38, 38, 0.15);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: #fecaca;
 }
 </style>

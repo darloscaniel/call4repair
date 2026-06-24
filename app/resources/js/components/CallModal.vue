@@ -3,53 +3,52 @@
     <div class="modal">
       <h3>{{ t('callModal.title') }}</h3>
 
-      <div class="form-group">
+      <div class="field">
         <label>{{ t('callModal.customer') }}</label>
-        <input v-model="edited.customer_name" type="text" class="input-text" />
+        <input v-model="edited.customer_name" type="text" class="input" />
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label>{{ t('callModal.phone') }}</label>
-        <input v-model="edited.phone" type="tel" class="input-text" />
+        <input v-model="edited.phone" type="tel" class="input" />
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label>{{ t('callModal.description') }}</label>
-        <textarea v-model="edited.description" class="input-textarea" rows="3"></textarea>
+        <textarea v-model="edited.description" class="textarea" rows="3"></textarea>
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label>{{ t('callModal.status') }}</label>
-        <select v-model="edited.status" class="input-select">
+        <select v-model="edited.status" class="select">
           <option v-for="option in statusOptions" :key="option" :value="option">
             {{ t(`status.${option}`) }}
           </option>
         </select>
       </div>
 
-      <div class="form-group">
+      <div class="field">
         <label>{{ t('callModal.employees') }}</label>
         <div class="scrollbox">
-          <div
-            class="checkbox-item"
+          <label
+            class="check"
             v-for="employee in employees"
             :key="employee.id"
           >
-            <label>
-              <input
-                type="checkbox"
-                :value="employee.id"
-                v-model="editedEmployeeIds"
-              />
-              {{ employee.name }}
-            </label>
-          </div>
+            <input
+              type="checkbox"
+              :value="employee.id"
+              v-model="editedEmployeeIds"
+            />
+            <span>{{ employee.name }}</span>
+          </label>
+          <p v-if="!employees.length" class="muted">—</p>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-save" @click="save">{{ t('callModal.save') }}</button>
-        <button class="btn-cancel" @click="$emit('close')">{{ t('callModal.cancel') }}</button>
+        <button class="btn btn--ghost" @click="$emit('close')">{{ t('callModal.cancel') }}</button>
+        <button class="btn btn--success" @click="save">{{ t('callModal.save') }}</button>
       </div>
     </div>
   </div>
@@ -106,102 +105,41 @@ const save = () => {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  width: 450px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.modal h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.input-select,
-.input-text,
-.input-textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  font-family: inherit;
-}
-
-.input-textarea {
-  resize: vertical;
-}
-
 .scrollbox {
-  max-height: 160px;
+  max-height: 170px;
   overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 0.5rem;
-  background-color: #fafafa;
-}
-
-.checkbox-item {
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.checkbox-item input {
-  margin-right: 0.5rem;
-}
-
-.modal-actions {
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem;
+  background: var(--c-surface-2);
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.btn-save {
-  background-color: #38a169;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
   border-radius: 8px;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background-color .12s ease;
+}
+.check:hover {
+  background: var(--c-primary-50);
+}
+.check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--c-primary);
   cursor: pointer;
 }
 
-.btn-cancel {
-  background-color: #e53e3e;
-  color: white;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.description {
-  background: #f9f9f9;
-  padding: 0.75rem;
-  border-radius: 8px;
-  max-height: 150px;
-  overflow-y: auto;
-  font-size: 0.95rem;
-  margin-top: 0.5rem;
-  white-space: pre-wrap;
+.muted {
+  color: var(--c-text-faint);
+  font-style: italic;
+  margin: 0.4rem 0.6rem;
 }
 </style>

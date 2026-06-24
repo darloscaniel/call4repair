@@ -25,8 +25,7 @@ const route = useRoute()
 
 .content {
   flex: 1;
-  padding: 24px;
   overflow-y: auto;
-  background-color: #f0f2f5;
+  background-color: var(--c-bg);
 }
 </style>

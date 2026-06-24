@@ -9,7 +9,7 @@
     "logout": "🔒 Sair"
   },
   "dashboard": {
-    "title": "🏠 Painel do Administrador",
+    "title": "Painel do Administrador",
     "subtitle": "Gerencie chamados e funcionários da oficina.",
     "callsTitle": "Chamados",
     "callsDesc": "Visualizar, editar e atribuir funcionários aos chamados.",
@@ -26,9 +26,10 @@
     "genericError": "Erro ao tentar logar. Tente novamente."
   },
   "employees": {
-    "title": "👥 Funcionários",
+    "title": "Funcionários",
+    "subtitle": "Cadastre, edite e remova a equipe da oficina.",
     "create": "Criar Funcionário",
-    "search": "🔍 Pesquisar funcionário...",
+    "search": "Pesquisar funcionário...",
     "name": "Nome",
     "email": "Email",
     "phone": "Telefone",
@@ -38,8 +39,9 @@
     "confirmDelete": "Tem certeza que deseja excluir este funcionário?"
   },
   "calls": {
-    "title": "🛠️ Chamados",
-    "search": "🔍 Pesquisar cliente...",
+    "title": "Chamados",
+    "subtitle": "Acompanhe, edite e atribua funcionários aos chamados.",
+    "search": "Pesquisar cliente...",
     "customer": "Cliente",
     "phone": "Telefone",
     "description": "Descrição",
@@ -84,7 +86,8 @@
     "submit": "Enviar Chamado",
     "success": "Chamado criado com sucesso!",
     "error": "Erro ao criar chamado. Tente novamente.",
-    "rateLimit": "Muitas tentativas. Aguarde um minuto e tente novamente."
+    "rateLimit": "Muitas tentativas. Aguarde um minuto e tente novamente.",
+    "back": "Voltar para o login"
   },
   "status": {
     "open": "Aberto",

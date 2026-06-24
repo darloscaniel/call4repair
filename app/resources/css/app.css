@@ -1,55 +1,370 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #fafafa;
-  margin: 0;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ============================================================
+   Design tokens — modern light SaaS theme (blue accent)
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --c-bg: #f4f6fb;
+  --c-surface: #ffffff;
+  --c-surface-2: #f8fafc;
+  --c-border: #e6e9f0;
+  --c-border-strong: #d4d9e4;
+
+  /* Text */
+  --c-text: #111827;
+  --c-text-muted: #6b7280;
+  --c-text-faint: #9aa3b2;
+
+  /* Brand */
+  --c-primary: #2d89ef;
+  --c-primary-600: #2267c5;
+  --c-primary-50: #eaf2fe;
+
+  /* Status */
+  --c-success: #15803d;
+  --c-success-bg: #dcfce7;
+  --c-warning: #b45309;
+  --c-warning-bg: #fef3c7;
+  --c-danger: #b91c1c;
+  --c-danger-bg: #fee2e2;
+  --c-info: #6d28d9;
+  --c-info-bg: #ede9fe;
+
+  /* Sidebar */
+  --c-sidebar: #131a2b;
+  --c-sidebar-2: #1d2740;
+  --c-sidebar-text: #c5ccda;
+  --c-sidebar-muted: #828ca3;
+
+  /* Shape & depth */
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, .06), 0 1px 3px rgba(16, 24, 40, .08);
+  --shadow-md: 0 6px 16px rgba(16, 24, 40, .08);
+  --shadow-lg: 0 16px 40px rgba(16, 24, 40, .14);
+  --ring: 0 0 0 3px rgba(45, 137, 239, .18);
+
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
+/* ============================================================
+   Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 #app {
   display: flex;
-  height: 100vh;
-  font-family: Arial, sans-serif;
+  min-height: 100vh;
 }
 
-.sidebar {
-  width: 220px;
-  background-color: #2c3e50;
-  color: white;
-  padding: 20px;
+h1, h2, h3, h4 {
+  color: var(--c-text);
+  letter-spacing: -0.01em;
 }
 
-.sidebar nav ul {
-  list-style: none;
-  padding: 0;
+a {
+  color: var(--c-primary);
+  text-decoration: none;
+}
+
+/* Subtle, modern scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--c-border-strong);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ============================================================
+   Reusable page scaffolding
+   ============================================================ */
+.page {
+  padding: 2rem 2.25rem;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.page__header {
+  margin-bottom: 1.5rem;
+}
+
+.page__title {
+  font-size: 1.6rem;
+  font-weight: 700;
   margin: 0;
 }
 
-.sidebar nav ul li {
-  margin-bottom: 15px;
+.page__subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--c-text-muted);
+  font-size: 0.95rem;
 }
 
-.sidebar nav ul li a {
-  color: white;
-  text-decoration: none;
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.panel {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
   font-weight: 600;
-  display: block;
-  padding: 10px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease,
+    color .15s ease, box-shadow .15s ease, transform .05s ease;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
 }
 
-.sidebar nav ul li a:hover {
-  background-color: #34495e;
+.btn--primary {
+  background: var(--c-primary);
+  color: #fff;
+}
+.btn--primary:hover {
+  background: var(--c-primary-600);
 }
 
-.main-content {
-  flex-grow: 1;
-  padding: 30px;
-  background-color: #ecf0f1;
+.btn--success {
+  background: var(--c-success);
+  color: #fff;
+}
+.btn--success:hover {
+  filter: brightness(0.95);
+}
+
+.btn--danger {
+  background: var(--c-danger);
+  color: #fff;
+}
+.btn--danger:hover {
+  filter: brightness(0.95);
+}
+
+.btn--ghost {
+  background: var(--c-surface);
+  border-color: var(--c-border-strong);
+  color: var(--c-text);
+}
+.btn--ghost:hover {
+  background: var(--c-surface-2);
+}
+
+.btn--sm {
+  padding: 0.45rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ============================================================
+   Inputs
+   ============================================================ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.field > label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-sm);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--c-text-faint);
+}
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: var(--ring);
+}
+.textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+.input[readonly] {
+  background: var(--c-surface-2);
+  color: var(--c-text-muted);
+  cursor: not-allowed;
+}
+
+/* Search field with leading icon spacing */
+.search {
+  width: 280px;
+  max-width: 100%;
+}
+
+/* ============================================================
+   Status badges
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.7rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}
+.badge--open        { background: var(--c-info-bg);    color: var(--c-info); }
+.badge--in_progress { background: var(--c-warning-bg); color: var(--c-warning); }
+.badge--done        { background: var(--c-success-bg); color: var(--c-success); }
+.badge--rejected    { background: var(--c-danger-bg);  color: var(--c-danger); }
+
+/* ============================================================
+   Modal (shared by CallModal / EmployeeFormModal)
+   ============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 1rem;
+}
+.modal {
+  background: var(--c-surface);
+  border-radius: var(--radius);
+  width: 460px;
+  max-width: 100%;
+  max-height: 90vh;
   overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  padding: 1.75rem;
+}
+.modal h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 1.4rem;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* ============================================================
+   vue3-easy-data-table — themed to match the design system
+   ============================================================ */
+.customize-table {
+  --easy-table-border: none;
+  --easy-table-row-border: 1px solid var(--c-border);
+
+  --easy-table-header-font-size: 13px;
+  --easy-table-header-height: 52px;
+  --easy-table-header-font-color: var(--c-text-muted);
+  --easy-table-header-background-color: var(--c-surface-2);
+  --easy-table-header-item-padding: 12px 18px;
+
+  --easy-table-body-row-font-size: 14px;
+  --easy-table-body-row-height: 56px;
+  --easy-table-body-row-font-color: var(--c-text);
+  --easy-table-body-item-padding: 12px 18px;
+  --easy-table-body-row-hover-background-color: var(--c-primary-50);
+  --easy-table-body-row-hover-font-color: var(--c-text);
+
+  --easy-table-footer-background-color: var(--c-surface);
+  --easy-table-footer-font-color: var(--c-text-muted);
+  --easy-table-footer-font-size: 13px;
+  --easy-table-footer-padding: 0 18px;
+  --easy-table-footer-height: 56px;
+
+  --easy-table-scrollbar-thumb-color: var(--c-border-strong);
+  --easy-table-loading-mask-background-color: var(--c-surface);
+}
+.customize-table thead th {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }

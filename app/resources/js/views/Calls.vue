@@ -1,16 +1,21 @@
 <template>
-  <div class="calls-container">
-    <h2 class="title">{{ t('calls.title') }}</h2>
-    <div class="search-box">
+  <div class="page">
+    <header class="page__header">
+      <h2 class="page__title">{{ t('calls.title') }}</h2>
+      <p class="page__subtitle">{{ t('calls.subtitle') }}</p>
+    </header>
+
+    <div class="toolbar">
+      <span></span>
       <input
         type="text"
         v-model="search"
         :placeholder="t('calls.search')"
-        class="search-input"
+        class="input search"
       />
     </div>
 
-    <div class="table-wrapper">
+    <div class="panel">
       <EasyDataTable
         v-model:server-options="serverOptions"
         :server-items-length="totalItems"
@@ -20,27 +25,27 @@
         table-class-name="customize-table"
         header-text-direction="center"
         body-text-direction="center"
-        alternating
+        :rows-items="[10, 25, 50]"
         show-index
         :loading="loading"
         @click-row="openModal"
       >
         <template #item-status="{ status }">
-          <div class="status-container">
-            <span :class="['status-badge', statusClass(status)]">
+          <div class="cell-center">
+            <span :class="['badge', `badge--${status}`]">
               {{ statusText(status) }}
             </span>
           </div>
         </template>
 
         <template #item-employees="{ employees }">
-          <div class="employees-container">
-            <ul v-if="employees && employees.length" class="employees-list">
+          <div class="employees-cell">
+            <ul v-if="employees && employees.length" class="chips">
               <li v-for="employee in employees" :key="employee.id">
-                <span class="employee-badge">{{ employee.name }}</span>
+                <span class="chip">{{ employee.name }}</span>
               </li>
             </ul>
-            <span v-else class="no-employees">{{ t('calls.assign') }}</span>
+            <span v-else class="muted">{{ t('calls.assign') }}</span>
           </div>
         </template>
         <template #item-description="{ description }">
@@ -96,10 +101,6 @@ const headers = [
   { text: t('calls.status'), value: 'status', width: 150 },
   { text: t('calls.employees'), value: 'employees' },
 ]
-
-const statusClass = (status) => {
-  return `status-${status}`
-}
 
 const statusText = (status) => {
   return t(`status.${status}`)
@@ -177,135 +178,47 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.calls-container {
-  padding: 2rem;
-  max-width: 1500px;
-  margin: 0 auto;
-}
-
-.title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #2d3748;
-  text-align: center;
-}
-
-.table-wrapper {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-</style>
-
-<style>
-.customize-table {
-  --easy-table-header-font-size: 14px;
-  --easy-table-header-height: 50px;
-  --easy-table-header-item-padding: 10px 15px;
-  --easy-table-body-row-height: 50px;
-  --easy-table-body-item-padding: 10px 15px;
-  --easy-table-footer-height: 50px;
-  --easy-table-footer-font-size: 14px;
-  --easy-table-footer-padding: 0 15px;
-}
-
-.employees-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.employee-badge {
-  background-color: #e2e8f0;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  color: #4a5568;
-}
-
-.no-employees {
-  color: #a0aec0;
-  font-style: italic;
-}
-
-.status-container {
-  padding: 8px 0;
+.cell-center {
   display: flex;
   justify-content: center;
 }
 
-.status-badge {
-  padding: 8px 16px;
-  min-width: 100px;
-  display: inline-block;
-  text-align: center;
+.employees-cell {
+  padding: 6px 0;
 }
 
-.status-open {
-  background-color: #ffa4ff;
-  color: #7a018a;
+.chips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
 }
 
-.status-in_progress {
-  background-color: #feebc8;
-  color: #dd8520;
+.chip {
+  background-color: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  color: var(--c-text-muted);
+  white-space: nowrap;
 }
 
-.status-done {
-  background-color: #c6f6d5;
-  color: #38a169;
-}
-
-.status-rejected {
-  background-color: #f6c6c6;
-  color: #7e0000;
-}
-
-.easy-data-table__pagination {
-  padding: 15px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.easy-data-table__body tr:nth-child(even) {
-  background-color: #f7fafc;
-}
-
-.easy-data-table__body tr:hover {
-  background-color: #ebf8ff;
-}
-
-.clickable-cell {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.clickable-cell:hover {
-  background-color: #edf2f7;
+.muted {
+  color: var(--c-text-faint);
+  font-style: italic;
+  font-size: 0.85rem;
 }
 
 .description-cell {
-  max-width: 300px;
+  max-width: 320px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.search-box {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.search-input {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-  width: 250px;
+  margin: 0 auto;
+  color: var(--c-text-muted);
 }
 </style>

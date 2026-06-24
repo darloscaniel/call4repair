@@ -1,25 +1,27 @@
 <template>
-  <div class="dashboard-container">
-    <h2 class="title">{{ t('dashboard.title') }}</h2>
-    <p class="subtitle">{{ t('dashboard.subtitle') }}</p>
+  <div class="page">
+    <header class="page__header">
+      <h2 class="page__title">{{ t('dashboard.title') }}</h2>
+      <p class="page__subtitle">{{ t('dashboard.subtitle') }}</p>
+    </header>
 
     <div class="cards">
       <RouterLink to="/calls" class="card">
-        <div class="card-icon">🛠️</div>
-        <div class="card-body">
-          <h3>{{ t('dashboard.callsTitle') }}</h3>
-          <p class="card-desc">{{ t('dashboard.callsDesc') }}</p>
-          <span class="card-count">{{ callsTotal }}</span>
+        <div class="card__icon card__icon--calls">🛠️</div>
+        <div class="card__body">
+          <h3 class="card__title">{{ t('dashboard.callsTitle') }}</h3>
+          <p class="card__desc">{{ t('dashboard.callsDesc') }}</p>
         </div>
+        <span class="card__count">{{ callsTotal }}</span>
       </RouterLink>
 
       <RouterLink v-if="can('manage employees')" to="/employees" class="card">
-        <div class="card-icon">👥</div>
-        <div class="card-body">
-          <h3>{{ t('dashboard.employeesTitle') }}</h3>
-          <p class="card-desc">{{ t('dashboard.employeesDesc') }}</p>
-          <span class="card-count">{{ employeesTotal }}</span>
+        <div class="card__icon card__icon--employees">👥</div>
+        <div class="card__body">
+          <h3 class="card__title">{{ t('dashboard.employeesTitle') }}</h3>
+          <p class="card__desc">{{ t('dashboard.employeesDesc') }}</p>
         </div>
+        <span class="card__count">{{ employeesTotal }}</span>
       </RouterLink>
     </div>
   </div>
@@ -67,70 +69,66 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dashboard-container {
-  padding: 2rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #2d3748;
-  text-align: center;
-}
-
-.subtitle {
-  text-align: center;
-  color: #718096;
-  margin-bottom: 2rem;
-}
-
 .cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  max-width: 760px;
 }
 
 .card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem 2rem;
-  min-width: 280px;
-  text-decoration: none;
+  gap: 1.1rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1.4rem 1.6rem;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
+  border-color: var(--c-border-strong);
 }
 
-.card-icon {
-  font-size: 2.5rem;
+.card__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+.card__icon--calls { background: var(--c-primary-50); }
+.card__icon--employees { background: var(--c-info-bg); }
+
+.card__body {
+  flex: 1;
 }
 
-.card-body h3 {
+.card__title {
   margin: 0;
-  font-size: 1.25rem;
-  color: #2d3748;
-}
-
-.card-desc {
-  margin: 0.25rem 0 0.5rem;
-  color: #718096;
-  font-size: 0.9rem;
-}
-
-.card-count {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #2d89ef;
+}
+
+.card__desc {
+  margin: 0.25rem 0 0;
+  color: var(--c-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.card__count {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--c-primary);
+  font-variant-numeric: tabular-nums;
 }
 </style>

@@ -1,20 +1,22 @@
 <template>
-  <div class="employees-container">
-    <h2 class="title">{{ t('employees.title') }}</h2>
+  <div class="page">
+    <header class="page__header">
+      <h2 class="page__title">{{ t('employees.title') }}</h2>
+      <p class="page__subtitle">{{ t('employees.subtitle') }}</p>
+    </header>
 
-    <div class="actions-top">
-      <button class="btn-create" @click="createEmployee">
+    <div class="toolbar">
+      <button class="btn btn--primary" @click="createEmployee">
         <i class="fas fa-plus"></i> {{ t('employees.create') }}
       </button>
-    </div>
-    <div class="search-box">
       <input
         type="text"
         v-model="search"
         :placeholder="t('employees.search')"
-        class="search-input"
+        class="input search"
       />
     </div>
+
     <EmployeeFormModal
       v-if="showCreateModal || showEditModal"
       :employee="selectedEmployee"
@@ -22,7 +24,7 @@
       @save="handleSave"
     />
 
-    <div class="table-wrapper">
+    <div class="panel">
       <EasyDataTable
         v-model:server-options="serverOptions"
         :server-items-length="totalItems"
@@ -33,24 +35,22 @@
         table-class-name="customize-table"
         header-text-direction="center"
         body-text-direction="center"
-        alternating
+        :rows-items="[10, 25, 50]"
         show-index
       >
         <template #item-actions="{ id }">
-          <div class="actions-container">
-            <button class="btn-edit" @click="edit(id)">
+          <div class="actions-cell">
+            <button class="btn btn--ghost btn--sm" @click="edit(id)">
               <i class="fas fa-edit"></i> {{ t('employees.edit') }}
             </button>
-            <button class="btn-delete" @click="remove(id)">
+            <button class="btn btn--danger btn--sm" @click="remove(id)">
               <i class="fas fa-trash"></i> {{ t('employees.delete') }}
             </button>
           </div>
         </template>
 
         <template #item-phone="{ phone }">
-          <span class="phone-number">
-            {{ phone || '-' }}
-          </span>
+          <span>{{ phone || '–' }}</span>
         </template>
       </EasyDataTable>
     </div>
@@ -82,7 +82,7 @@ const headers = [
   { text: t('employees.name'), value: 'name' },
   { text: t('employees.email'), value: 'email' },
   { text: t('employees.phone'), value: 'phone', width: 150 },
-  { text: t('employees.actions'), value: 'actions', width: 200 },
+  { text: t('employees.actions'), value: 'actions', width: 220 },
 ]
 
 const loadEmployees = async () => {
@@ -161,100 +161,9 @@ const remove = async (id) => {
 </script>
 
 <style scoped>
-.employees-container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-  color: #2d3748;
-  text-align: center;
-}
-
-.actions-top {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
-}
-
-.btn-create {
-  background-color: #38a169;
-  color: white;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.2s ease;
-}
-
-.btn-create:hover {
-  background-color: #2f855a;
-}
-
-.table-wrapper {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.actions-container {
+.actions-cell {
   display: flex;
   gap: 8px;
   justify-content: center;
-}
-
-.btn-edit, .btn-delete {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-edit {
-  background-color: #4299e1;
-  color: white;
-}
-
-.btn-edit:hover {
-  background-color: #3182ce;
-}
-
-.btn-delete {
-  background-color: #f56565;
-  color: white;
-}
-
-.btn-delete:hover {
-  background-color: #e53e3e;
-}
-
-.search-box {
-  margin-bottom: 1rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.search-input {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-  width: 250px;
 }
 </style>

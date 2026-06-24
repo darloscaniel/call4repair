@@ -10,8 +10,7 @@ class Employee extends Model
     use HasFactory;
 
     /**
-     * Atributos que podem ser atribuídos em massa.
-     * Isso protege seu modelo contra Mass Assignment.
+     * Mass-assignable attributes (guards against mass assignment).
      */
     protected $fillable = [
         'name',
@@ -21,8 +20,8 @@ class Employee extends Model
     ];
 
     /**
-     * Relacionamento N:N com chamados (calls)
-     * Um funcionário pode estar em vários chamados.
+     * Many-to-many relationship with calls.
+     * An employee can be assigned to many calls.
      */
     public function calls()
     {

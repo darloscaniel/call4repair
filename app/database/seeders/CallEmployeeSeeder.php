@@ -9,8 +9,8 @@ use App\Models\Employee;
 class CallEmployeeSeeder extends Seeder
 {
     /**
-     * Vincula funcionários aos chamados de forma idempotente,
-     * resolvendo os registros pelas chaves naturais (não por IDs fixos).
+     * Link employees to calls idempotently, resolving records by their
+     * natural keys (not by hard-coded IDs).
      */
     public function run(): void
     {

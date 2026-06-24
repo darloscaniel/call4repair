@@ -1,32 +1,31 @@
 <template>
-  <div class="funcionarios-container">
-    <h2 class="titulo">👥 Funcionários</h2>
-
+  <div class="employees-container">
+    <h2 class="title">{{ t('employees.title') }}</h2>
 
     <div class="actions-top">
-      <button class="btn-criar" @click="criarFuncionario">
-        <i class="fas fa-plus"></i> Criar Funcionário
+      <button class="btn-create" @click="createEmployee">
+        <i class="fas fa-plus"></i> {{ t('employees.create') }}
       </button>
     </div>
-<div class="search-box">
-  <input
-    type="text"
-    v-model="search"
-    placeholder="🔍 Pesquisar funcionário..."
-    class="input-pesquisa"
-  />
-</div>
- <ModalFuncionario
-  v-if="showModalCriar || showModalEditar"
-  :funcionario="funcionarioSelecionado"
-  @close="fecharModal"
-  @save="handleSalvarOuAtualizar"
-/>
+    <div class="search-box">
+      <input
+        type="text"
+        v-model="search"
+        :placeholder="t('employees.search')"
+        class="search-input"
+      />
+    </div>
+    <EmployeeFormModal
+      v-if="showCreateModal || showEditModal"
+      :employee="selectedEmployee"
+      @close="closeModal"
+      @save="handleSave"
+    />
 
     <div class="table-wrapper">
       <EasyDataTable
         :headers="headers"
-        :items="funcionarios"
+        :items="employees"
         :loading="loading"
         :search-value="search"
         theme-color="#2d89ef"
@@ -40,11 +39,11 @@
       >
         <template #item-actions="{ id }">
           <div class="actions-container">
-            <button class="btn-editar" @click="editar(id)">
-              <i class="fas fa-edit"></i> Editar
+            <button class="btn-edit" @click="edit(id)">
+              <i class="fas fa-edit"></i> {{ t('employees.edit') }}
             </button>
-            <button class="btn-excluir" @click="excluir(id)">
-              <i class="fas fa-trash"></i> Excluir
+            <button class="btn-delete" @click="remove(id)">
+              <i class="fas fa-trash"></i> {{ t('employees.delete') }}
             </button>
           </div>
         </template>
@@ -64,81 +63,82 @@ import { ref, onMounted } from 'vue'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import '@fortawesome/fontawesome-free/css/all.css'
+import { useI18n } from 'vue-i18n'
 import api from '../api'
-import ModalFuncionario from '@/components/CriarFuncionarioModal.vue'
+import EmployeeFormModal from '@/components/EmployeeFormModal.vue'
 
-const showModalCriar = ref(false)
-const showModalEditar = ref(false)
-const funcionarioSelecionado = ref(null)
-const funcionarios = ref([])
+const { t } = useI18n()
+
+const showCreateModal = ref(false)
+const showEditModal = ref(false)
+const selectedEmployee = ref(null)
+const employees = ref([])
 const loading = ref(true)
 const search = ref('')
 const error = ref(null)
 const rowsPerPage = ref(25)
 
 const headers = [
-  { text: 'Nome', value: 'name' },
-  { text: 'Email', value: 'email' },
-  { text: 'Telefone', value: 'phone', width: 150 },
-  { text: 'Ações', value: 'actions', width: 200 }
+  { text: t('employees.name'), value: 'name' },
+  { text: t('employees.email'), value: 'email' },
+  { text: t('employees.phone'), value: 'phone', width: 150 },
+  { text: t('employees.actions'), value: 'actions', width: 200 },
 ]
 
-const criarFuncionario = () => {
-  funcionarioSelecionado.value = { name: '', age: '', phone: '', email: '' }
-  showModalCriar.value = true
+const createEmployee = () => {
+  selectedEmployee.value = { name: '', age: '', phone: '', email: '' }
+  showCreateModal.value = true
 }
 
-const editar = (id) => {
-  const func = funcionarios.value.find(f => f.id === id)
-  if (func) {
-    funcionarioSelecionado.value = { ...func }
-    showModalEditar.value = true
+const edit = (id) => {
+  const employee = employees.value.find((e) => e.id === id)
+  if (employee) {
+    selectedEmployee.value = { ...employee }
+    showEditModal.value = true
   }
 }
 
-const handleSalvarOuAtualizar = async (func) => {
+const handleSave = async (employee) => {
   try {
-    if (func.id) {
-
-      const response = await api.put(`/employees/${func.id}`, func)
-      const atualizado = response.data
-      funcionarios.value = funcionarios.value.map(f => f.id === atualizado.id ? atualizado : f)
+    if (employee.id) {
+      const response = await api.put(`/employees/${employee.id}`, employee)
+      const updated = response.data
+      employees.value = employees.value.map((e) => (e.id === updated.id ? updated : e))
     } else {
-   
-      const response = await api.post('/employees', func)
-      funcionarios.value.push(response.data)
+      const response = await api.post('/employees', employee)
+      employees.value.push(response.data)
     }
-  } catch (error) {
-    console.error('Erro ao salvar funcionário:', error)
+  } catch (err) {
+    console.error('Error saving employee:', err)
   } finally {
-    fecharModal()
+    closeModal()
   }
 }
 
-const fecharModal = () => {
-  showModalCriar.value = false
-  showModalEditar.value = false
+const closeModal = () => {
+  showCreateModal.value = false
+  showEditModal.value = false
 }
 
 onMounted(async () => {
   try {
     const { data } = await api.get('/employees')
-    funcionarios.value = data
+    employees.value = data
   } catch (err) {
-    error.value = 'Erro ao carregar funcionários.'
+    error.value = 'Error loading employees.'
     console.error(err)
   } finally {
     loading.value = false
   }
 })
 
-const excluir = async (id) => {
-  if (confirm('Tem certeza que deseja excluir este funcionário?')) {
+const remove = async (id) => {
+  if (confirm(t('employees.confirmDelete'))) {
     try {
       await api.delete(`/employees/${id}`)
-      funcionarios.value = funcionarios.value.filter(f => f.id !== id)
-    } catch (error) {
-      console.error('Erro ao excluir funcionário:', error)
+      employees.value = employees.value.filter((e) => e.id !== id)
+    } catch (err) {
+      console.error('Error deleting employee:', err)
     }
   }
 }
@@ -149,13 +149,13 @@ const updateRowsPerPage = (value) => {
 </script>
 
 <style scoped>
-.funcionarios-container {
+.employees-container {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.titulo {
+.title {
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -169,7 +169,7 @@ const updateRowsPerPage = (value) => {
   margin-bottom: 1rem;
 }
 
-.btn-criar {
+.btn-create {
   background-color: #38a169;
   color: white;
   padding: 8px 14px;
@@ -184,7 +184,7 @@ const updateRowsPerPage = (value) => {
   transition: background-color 0.2s ease;
 }
 
-.btn-criar:hover {
+.btn-create:hover {
   background-color: #2f855a;
 }
 
@@ -201,7 +201,7 @@ const updateRowsPerPage = (value) => {
   justify-content: center;
 }
 
-.btn-editar, .btn-excluir {
+.btn-edit, .btn-delete {
   padding: 8px 12px;
   border: none;
   border-radius: 20px;
@@ -214,21 +214,21 @@ const updateRowsPerPage = (value) => {
   gap: 6px;
 }
 
-.btn-editar {
+.btn-edit {
   background-color: #4299e1;
   color: white;
 }
 
-.btn-editar:hover {
+.btn-edit:hover {
   background-color: #3182ce;
 }
 
-.btn-excluir {
+.btn-delete {
   background-color: #f56565;
   color: white;
 }
 
-.btn-excluir:hover {
+.btn-delete:hover {
   background-color: #e53e3e;
 }
 
@@ -238,12 +238,11 @@ const updateRowsPerPage = (value) => {
   justify-content: flex-end;
 }
 
-.input-pesquisa {
+.search-input {
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 0.95rem;
   width: 250px;
 }
-
 </style>

@@ -1,31 +1,31 @@
 <template>
-  <div class="chamados-container">
-    <h2 class="titulo">🛠️ Chamados</h2>
+  <div class="calls-container">
+    <h2 class="title">{{ t('calls.title') }}</h2>
     <div class="search-box">
-  <input
-    type="text"
-    v-model="search"
-    placeholder="🔍 Pesquisar cliente..."
-    class="input-pesquisa"
-  />
-</div>
+      <input
+        type="text"
+        v-model="search"
+        :placeholder="t('calls.search')"
+        class="search-input"
+      />
+    </div>
 
     <div class="table-wrapper">
-<EasyDataTable
-v-if="!loading"
-:headers="headers"
-:items="processedChamados"
-theme-color="#2d89ef"
-table-class-name="customize-table"
-header-text-direction="center"
-body-text-direction="center"
-alternating
-:rows-per-page="25"
-show-index
-:loading="loading"
-:search-value="search"
-@click-row="openModal"
->
+      <EasyDataTable
+        v-if="!loading"
+        :headers="headers"
+        :items="processedCalls"
+        theme-color="#2d89ef"
+        table-class-name="customize-table"
+        header-text-direction="center"
+        body-text-direction="center"
+        alternating
+        :rows-per-page="25"
+        show-index
+        :loading="loading"
+        :search-value="search"
+        @click-row="openModal"
+      >
         <template #item-status="{ status }">
           <div class="status-container">
             <span :class="['status-badge', statusClass(status)]">
@@ -34,14 +34,14 @@ show-index
           </div>
         </template>
 
-        <template #item-employees="{ employees, item }">
+        <template #item-employees="{ employees }">
           <div class="employees-container">
             <ul v-if="employees && employees.length" class="employees-list">
-              <li v-for="func in employees" :key="func.id">
-              <span class="employee-badge">{{ func.name }}</span>
+              <li v-for="employee in employees" :key="employee.id">
+                <span class="employee-badge">{{ employee.name }}</span>
               </li>
             </ul>
-            <span v-else class="no-employees">Clique para atribuir</span>
+            <span v-else class="no-employees">{{ t('calls.assign') }}</span>
           </div>
         </template>
         <template #item-description="{ description }">
@@ -50,13 +50,12 @@ show-index
           </div>
         </template>
       </EasyDataTable>
-      <ChamadosModal
-         v-if="showModal"
-        :chamado="selectedChamado"
-        :funcionarios="allFuncionarios"
+      <CallModal
+        v-if="showModal"
+        :call="selectedCall"
+        :employees="allEmployees"
         @close="showModal = false"
         @save="handleSave"
-    
       />
     </div>
   </div>
@@ -65,51 +64,47 @@ show-index
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import EasyDataTable from 'vue3-easy-data-table'
 import 'vue3-easy-data-table/dist/style.css'
 import api from '../api'
-import ChamadosModal from '@/components/ChamadosModal.vue'
+import CallModal from '@/components/CallModal.vue'
 
 const router = useRouter()
-const chamados = ref([])
+const { t } = useI18n()
+const calls = ref([])
 const loading = ref(true)
 const search = ref('')
 const showModal = ref(false)
-const selectedChamado = ref({})
-const allFuncionarios = ref([])
+const selectedCall = ref({})
+const allEmployees = ref([])
 
-const processedChamados = computed(() => {
-  return chamados.value.map(chamado => ({
-    ...chamado,
-    employees: chamado.employees || []
+const processedCalls = computed(() => {
+  return calls.value.map((call) => ({
+    ...call,
+    employees: call.employees || [],
   }))
 })
 
 const headers = [
-  { text: 'Cliente', value: 'customer_name' },
-  { text: 'Telefone', value: 'phone', width: 150 },
-  { text: 'Descrição', value: 'description' },
-  { text: 'Status', value: 'status', width: 150 },
-  { text: 'Funcionários', value: 'employees' }
+  { text: t('calls.customer'), value: 'customer_name' },
+  { text: t('calls.phone'), value: 'phone', width: 150 },
+  { text: t('calls.description'), value: 'description' },
+  { text: t('calls.status'), value: 'status', width: 150 },
+  { text: t('calls.employees'), value: 'employees' },
 ]
 
 const statusClass = (status) => {
-  return `status-${status.toLowerCase()}`
+  return `status-${status}`
 }
 
 const statusText = (status) => {
-  const map = {
-    'aberto': 'Aberto',
-    'em_andamento': 'Em Andamento',
-    'concluido': 'Concluído',
-    'recusado': 'Recusado'
-  }
-  return map[status] || status
+  return t(`status.${status}`)
 }
 
 const openModal = (row) => {
   if (!row || typeof row !== 'object') return
-  selectedChamado.value = { ...row, employees: row.employees || [] }
+  selectedCall.value = { ...row, employees: row.employees || [] }
   showModal.value = true
 }
 
@@ -117,17 +112,17 @@ const handleSave = async (updated) => {
   try {
     const response = await api.put(`/calls/${updated.id}`, {
       status: updated.status,
-      employees: updated.employees.map(e => e.id)
+      employees: updated.employees.map((e) => e.id),
     })
     const updatedData = response.data
 
-    chamados.value = chamados.value.map(ch =>
-      ch.id === updatedData.id ? updatedData : ch
+    calls.value = calls.value.map((call) =>
+      call.id === updatedData.id ? updatedData : call
     )
 
     showModal.value = false
   } catch (err) {
-    console.error('Erro ao salvar chamado:', err)
+    console.error('Error saving call:', err)
   }
 }
 
@@ -139,16 +134,16 @@ onMounted(async () => {
       return
     }
 
-    const { data: funcionariosData } = await api.get('/employees')
-    allFuncionarios.value = funcionariosData
+    const { data: employeesData } = await api.get('/employees')
+    allEmployees.value = employeesData
 
     const { data } = await api.get('/calls')
-    chamados.value = data.map(item => ({
+    calls.value = data.map((item) => ({
       ...item,
-      employees: item.employees || []
+      employees: item.employees || [],
     }))
   } catch (error) {
-    console.error('Erro ao carregar chamados:', error)
+    console.error('Error loading calls:', error)
     sessionStorage.removeItem('token')
     router.push('/login')
   } finally {
@@ -158,13 +153,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.chamados-container {
+.calls-container {
   padding: 2rem;
   max-width: 1500px;
   margin: 0 auto;
 }
 
-.titulo {
+.title {
   font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -215,35 +210,34 @@ onMounted(async () => {
 }
 
 .status-container {
-  padding: 8px 0; /* Espaço vertical aumentado */
+  padding: 8px 0;
   display: flex;
   justify-content: center;
 }
 
 .status-badge {
-  padding: 8px 16px; /* Aumente o padding horizontal */
-  min-width: 100px; /* Largura mínima para consistência */
+  padding: 8px 16px;
+  min-width: 100px;
   display: inline-block;
   text-align: center;
 }
 
-
-.status-aberto {
+.status-open {
   background-color: #ffa4ff;
   color: #7a018a;
 }
 
-.status-em_andamento {
+.status-in_progress {
   background-color: #feebc8;
   color: #dd8520;
 }
 
-.status-concluido {
+.status-done {
   background-color: #c6f6d5;
   color: #38a169;
 }
 
-.status-recusado {
+.status-rejected {
   background-color: #f6c6c6;
   color: #7e0000;
 }
@@ -271,7 +265,7 @@ onMounted(async () => {
 }
 
 .description-cell {
-  max-width: 300px; /* ajuste conforme necessário */
+  max-width: 300px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -283,12 +277,11 @@ onMounted(async () => {
   justify-content: flex-end;
 }
 
-.input-pesquisa {
+.search-input {
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 0.95rem;
   width: 250px;
 }
-
 </style>

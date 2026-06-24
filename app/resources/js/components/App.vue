@@ -1,9 +1,8 @@
 <template>
   <div class="layout">
-    <Sidebar v-if="!['/login', '/formulario'].includes(route.path)" />
-    
+    <Sidebar v-if="!['/login', '/new-call'].includes(route.path)" />
 
-    <main class="conteudo">
+    <main class="content">
       <RouterView />
     </main>
   </div>
@@ -24,7 +23,7 @@ const route = useRoute()
   width: 100%;
 }
 
-.conteudo {
+.content {
   flex: 1;
   padding: 24px;
   overflow-y: auto;

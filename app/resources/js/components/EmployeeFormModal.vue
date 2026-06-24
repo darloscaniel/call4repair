@@ -1,60 +1,60 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
-      <h3>{{ isEdicao ? 'Editar Funcionário' : 'Cadastrar Funcionário' }}</h3>
+      <h3>{{ isEditing ? t('employeeModal.editTitle') : t('employeeModal.createTitle') }}</h3>
 
       <form @submit.prevent="submitForm">
         <div class="form-group">
-          <label for="nome">Nome:</label>
+          <label for="name">{{ t('employeeModal.name') }}</label>
           <input
-            id="nome"
+            id="name"
             v-model="form.name"
             type="text"
-            placeholder="Digite o nome"
+            :placeholder="t('employeeModal.namePlaceholder')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="idade">Idade:</label>
+          <label for="age">{{ t('employeeModal.age') }}</label>
           <input
-            id="idade"
+            id="age"
             v-model.number="form.age"
             type="number"
             min="18"
             max="100"
-            placeholder="Digite a idade"
+            :placeholder="t('employeeModal.agePlaceholder')"
             required
           />
         </div>
 
         <div class="form-group">
-          <label for="telefone">Telefone:</label>
+          <label for="phone">{{ t('employeeModal.phone') }}</label>
           <input
-            id="telefone"
+            id="phone"
             v-model="form.phone"
             type="tel"
-            placeholder="Digite o telefone"
+            :placeholder="t('employeeModal.phonePlaceholder')"
             required
             pattern="^\+?[0-9\s\-]{8,15}$"
           />
         </div>
 
         <div class="form-group">
-          <label for="email">Email:</label>
+          <label for="email">{{ t('employeeModal.email') }}</label>
           <input
             id="email"
             v-model="form.email"
             type="email"
-            placeholder="Digite o email"
+            :placeholder="t('employeeModal.emailPlaceholder')"
             required
           />
         </div>
 
         <div class="modal-actions">
-          <button type="submit" class="btn-save">Salvar</button>
+          <button type="submit" class="btn-save">{{ t('employeeModal.save') }}</button>
           <button type="button" class="btn-cancel" @click="$emit('close')">
-            Cancelar
+            {{ t('employeeModal.cancel') }}
           </button>
         </div>
       </form>
@@ -64,9 +64,12 @@
 
 <script setup>
 import { reactive, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
-  funcionario: {
+  employee: {
     type: Object,
     default: () => ({ name: '', age: '', phone: '', email: '' })
   }
@@ -82,14 +85,14 @@ const form = reactive({
   email: ''
 })
 
-const isEdicao = computed(() => !!form.id)
+const isEditing = computed(() => !!form.id)
 
-watch(() => props.funcionario, (novo) => {
-  form.id = novo.id || null
-  form.name = novo.name || ''
-  form.age = novo.age || null
-  form.phone = novo.phone || ''
-  form.email = novo.email || ''
+watch(() => props.employee, (newEmployee) => {
+  form.id = newEmployee.id || null
+  form.name = newEmployee.name || ''
+  form.age = newEmployee.age || null
+  form.phone = newEmployee.phone || ''
+  form.email = newEmployee.email || ''
 }, { immediate: true })
 
 const submitForm = () => {

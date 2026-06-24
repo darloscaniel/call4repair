@@ -27,7 +27,7 @@ class CallTest extends TestCase
             'customer_name' => 'Cliente Teste',
             'phone'         => '11912345678',
             'description'   => 'Problema na lataria',
-            'status'        => 'aberto',
+            'status'        => 'open',
         ], $overrides);
     }
 
@@ -54,7 +54,7 @@ class CallTest extends TestCase
 
     public function test_store_validates_status_enum(): void
     {
-        $this->postJson('/api/calls', $this->validPayload(['status' => 'invalido']))
+        $this->postJson('/api/calls', $this->validPayload(['status' => 'invalid_status']))
             ->assertStatus(422)
             ->assertJsonValidationErrors(['status']);
     }
@@ -79,16 +79,16 @@ class CallTest extends TestCase
 
     public function test_update_syncs_employees(): void
     {
-        $call      = Call::factory()->create(['status' => 'aberto']);
+        $call      = Call::factory()->create(['status' => 'open']);
         $employees = Employee::factory()->count(2)->create();
 
         $this->withHeaders($this->authHeaders())
             ->putJson("/api/calls/{$call->id}", [
-                'status'    => 'em_andamento',
+                'status'    => 'in_progress',
                 'employees' => $employees->pluck('id')->all(),
             ])
             ->assertOk()
-            ->assertJsonPath('status', 'em_andamento')
+            ->assertJsonPath('status', 'in_progress')
             ->assertJsonCount(2, 'employees');
 
         $this->assertDatabaseHas('call_employee', [

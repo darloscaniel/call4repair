@@ -8,8 +8,8 @@ use App\Models\User;
 class UserSeeder extends Seeder
 {
     /**
-     * Cria o usuário padrão de acesso ao sistema (idempotente).
-     * Credencial: test@example.com / password
+     * Create the default system access user (idempotent).
+     * Credentials: test@example.com / password
      */
     public function run(): void
     {

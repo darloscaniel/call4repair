@@ -11,25 +11,25 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class EmployeeController extends Controller
 {
-    // Lista todos os funcionários
+    // List all employees
     public function index(): AnonymousResourceCollection
     {
         return EmployeeResource::collection(Employee::all());
     }
 
-    // Mostra um funcionário específico
+    // Show a single employee
     public function show($id): EmployeeResource|JsonResponse
     {
         $employee = Employee::find($id);
 
         if (!$employee) {
-            return response()->json(['message' => 'Funcionário não encontrado.'], 404);
+            return response()->json(['message' => __('messages.employee.not_found')], 404);
         }
 
         return new EmployeeResource($employee);
     }
 
-    // Cria um novo funcionário
+    // Create a new employee
     public function store(StoreEmployeeRequest $request): JsonResponse
     {
         $employee = Employee::create($request->validated());
@@ -39,13 +39,13 @@ class EmployeeController extends Controller
             ->setStatusCode(201);
     }
 
-    // Atualiza um funcionário existente
+    // Update an existing employee
     public function update(UpdateEmployeeRequest $request, $id): EmployeeResource|JsonResponse
     {
         $employee = Employee::find($id);
 
         if (!$employee) {
-            return response()->json(['message' => 'Funcionário não encontrado.'], 404);
+            return response()->json(['message' => __('messages.employee.not_found')], 404);
         }
 
         $employee->update($request->validated());
@@ -53,20 +53,20 @@ class EmployeeController extends Controller
         return new EmployeeResource($employee);
     }
 
-    // Deleta um funcionário
+    // Delete an employee
     public function destroy($id): JsonResponse
     {
         $employee = Employee::find($id);
 
         if (!$employee) {
-            return response()->json(['message' => 'Funcionário não encontrado.'], 404);
+            return response()->json(['message' => __('messages.employee.not_found')], 404);
         }
 
-        // Desvincula todos os chamados desse funcionário antes de deletar
+        // Detach all calls linked to this employee before deleting
         $employee->calls()->detach();
 
         $employee->delete();
 
-        return response()->json(['message' => 'Funcionário deletado com sucesso.']);
+        return response()->json(['message' => __('messages.employee.deleted')]);
     }
 }

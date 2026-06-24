@@ -1,46 +1,46 @@
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
-      <h3>Editar Chamado</h3>
+      <h3>{{ t('callModal.title') }}</h3>
 
       <div class="form-group">
-        <label><strong>Descrição:</strong></label>
-        <p class="descricao">{{ chamado.description }}</p>
+        <label><strong>{{ t('callModal.description') }}</strong></label>
+        <p class="description">{{ call.description }}</p>
       </div>
 
       <div class="form-group">
-        <label>Status:</label>
+        <label>{{ t('callModal.status') }}</label>
         <select v-model="edited.status" class="input-select">
-          <option value="aberto">Aberto</option>
-          <option value="em_andamento">Em Andamento</option>
-          <option value="concluido">Concluído</option>
-          <option value="recusado">Recusado</option>
+          <option value="open">{{ t('status.open') }}</option>
+          <option value="in_progress">{{ t('status.in_progress') }}</option>
+          <option value="done">{{ t('status.done') }}</option>
+          <option value="rejected">{{ t('status.rejected') }}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>Funcionários:</label>
+        <label>{{ t('callModal.employees') }}</label>
         <div class="scrollbox">
           <div
             class="checkbox-item"
-            v-for="func in funcionarios"
-            :key="func.id"
+            v-for="employee in employees"
+            :key="employee.id"
           >
             <label>
               <input
                 type="checkbox"
-                :value="func.id"
+                :value="employee.id"
                 v-model="editedEmployeeIds"
               />
-              {{ func.name }}
+              {{ employee.name }}
             </label>
           </div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-save" @click="save">Salvar</button>
-        <button class="btn-cancel" @click="$emit('close')">Cancelar</button>
+        <button class="btn-save" @click="save">{{ t('callModal.save') }}</button>
+        <button class="btn-cancel" @click="$emit('close')">{{ t('callModal.cancel') }}</button>
       </div>
     </div>
   </div>
@@ -48,10 +48,13 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
-  chamado: Object,
-  funcionarios: Array
+  call: Object,
+  employees: Array
 })
 
 const emit = defineEmits(['close', 'save'])
@@ -59,18 +62,18 @@ const emit = defineEmits(['close', 'save'])
 const edited = ref({})
 const editedEmployeeIds = ref([])
 
-watch(() => props.chamado, (novo) => {
+watch(() => props.call, (newCall) => {
   edited.value = {
-    id: novo.id,
-    status: novo.status,
-    employees: [...(novo.employees || [])]
+    id: newCall.id,
+    status: newCall.status,
+    employees: [...(newCall.employees || [])]
   }
-  editedEmployeeIds.value = edited.value.employees.map(e => Number(e.id))
+  editedEmployeeIds.value = edited.value.employees.map((e) => Number(e.id))
 }, { immediate: true })
 
 const save = () => {
-  edited.value.employees = props.funcionarios.filter(func =>
-    editedEmployeeIds.value.includes(func.id)
+  edited.value.employees = props.employees.filter((employee) =>
+    editedEmployeeIds.value.includes(employee.id)
   )
   emit('save', edited.value)
 }
@@ -156,7 +159,7 @@ const save = () => {
   cursor: pointer;
 }
 
-.descricao {
+.description {
   background: #f9f9f9;
   padding: 0.75rem;
   border-radius: 8px;

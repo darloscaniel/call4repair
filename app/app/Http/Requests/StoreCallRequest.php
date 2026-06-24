@@ -20,7 +20,7 @@ class StoreCallRequest extends FormRequest
             'customer_name' => ['required', 'string', 'max:255'],
             'phone'         => ['required', 'string', 'max:20'],
             'description'   => ['required', 'string', 'max:1000'],
-            'status'        => ['required', 'in:aberto,em_andamento,concluido,recusado'],
+            'status'        => ['required', 'in:open,in_progress,done,rejected'],
             'employees'     => ['sometimes', 'array'],
             'employees.*'   => ['exists:employees,id'],
         ];

@@ -18,7 +18,7 @@ class CallFactory extends Factory
             'customer_name' => fake()->name(),
             'phone'         => fake()->numerify('###########'),
             'description'   => fake()->sentence(),
-            'status'        => fake()->randomElement(['aberto', 'em_andamento', 'concluido', 'recusado']),
+            'status'        => fake()->randomElement(['open', 'in_progress', 'done', 'rejected']),
         ];
     }
 }

@@ -1,24 +1,24 @@
 <template>
   <div class="login-container">
     <form @submit.prevent="login" class="login-form">
-      <h2 class="title">🔐 Login</h2>
+      <h2 class="title">{{ t('login.title') }}</h2>
 
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">{{ t('login.email') }}</label>
         <input v-model="email" type="email" id="email" required />
       </div>
 
       <div class="form-group">
-        <label for="password">Senha</label>
+        <label for="password">{{ t('login.password') }}</label>
         <input v-model="password" type="password" id="password" required />
       </div>
 
       <div v-if="error" class="error-message">{{ error }}</div>
 
-      <button type="submit">Entrar</button> 
-      <button type="button" @click="goToFormulario" class="formulario-btn">
-      Abrir Chamado
-      </button> 
+      <button type="submit">{{ t('login.submit') }}</button>
+      <button type="button" @click="goToPublicForm" class="public-form-btn">
+        {{ t('login.openCall') }}
+      </button>
     </form>
   </div>
 </template>
@@ -27,14 +27,16 @@
 import { ref, onBeforeMount } from 'vue'
 import api from '../api'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const email = ref('')
 const password = ref('')
 const error = ref(null)
 const router = useRouter()
+const { t } = useI18n()
 
-const goToFormulario = () => {
-  router.push('/formulario')
+const goToPublicForm = () => {
+  router.push('/new-call')
 }
 
 onBeforeMount(() => {
@@ -50,12 +52,12 @@ const login = async () => {
     })
 
     sessionStorage.setItem('token', response.data.token)
-    router.push('/funcionarios')
+    router.push('/employees')
   } catch (err) {
     if (err.response && err.response.status === 401) {
-      error.value = 'Credenciais inválidas.'
+      error.value = t('login.invalidCredentials')
     } else {
-      error.value = 'Erro ao tentar logar. Tente novamente.'
+      error.value = t('login.genericError')
     }
   }
 }
@@ -125,7 +127,7 @@ button:hover {
   text-align: center;
 }
 
-.formulario-btn {
+.public-form-btn {
   width: 100%;
   padding: 0.75rem;
   background-color: #05a100;
@@ -137,7 +139,7 @@ button:hover {
   margin-top: 2%;
 }
 
-.formulario-btn:hover {
+.public-form-btn:hover {
   background-color: #3e8e41;
 }
 

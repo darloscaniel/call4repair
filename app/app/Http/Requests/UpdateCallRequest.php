@@ -20,7 +20,7 @@ class UpdateCallRequest extends FormRequest
             'customer_name' => ['sometimes', 'required', 'string', 'max:255'],
             'phone'         => ['sometimes', 'nullable', 'string', 'max:20'],
             'description'   => ['sometimes', 'required', 'string', 'max:1000'],
-            'status'        => ['sometimes', 'required', 'in:aberto,em_andamento,concluido,recusado'],
+            'status'        => ['sometimes', 'required', 'in:open,in_progress,done,rejected'],
             'employees'     => ['sometimes', 'array'],
             'employees.*'   => ['exists:employees,id'],
         ];

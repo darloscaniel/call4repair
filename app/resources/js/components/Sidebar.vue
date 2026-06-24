@@ -1,34 +1,35 @@
 <template>
   <aside class="sidebar">
-    <h1 class="title">Call4Repair</h1>
+    <h1 class="title">{{ t('app.title') }}</h1>
 
     <nav class="menu">
       <RouterLink
-        to="/funcionarios"
+        to="/employees"
         class="menu-link"
-        :class="{ active: $route.path === '/funcionarios' }"
-      >👥 Funcionários</RouterLink>
+        :class="{ active: $route.path === '/employees' }"
+      >{{ t('nav.employees') }}</RouterLink>
 
       <RouterLink
-        to="/chamados"
+        to="/calls"
         class="menu-link"
-        :class="{ active: $route.path === '/chamados' }"
-      >🛠️ Chamados</RouterLink>
+        :class="{ active: $route.path === '/calls' }"
+      >{{ t('nav.calls') }}</RouterLink>
     </nav>
 
     <div class="logout-container">
       <button class="logout-button" @click="logout">
-        🔒 Sair
+        {{ t('nav.logout') }}
       </button>
     </div>
   </aside>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-import { RouterLink } from 'vue-router'
+import { useRouter, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const logout = () => {
   sessionStorage.removeItem('token')

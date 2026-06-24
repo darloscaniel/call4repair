@@ -1,90 +1,89 @@
 <template>
-<h2 class="titulo">🔧 Call4Repair 🔧</h2>
+  <h2 class="title">{{ t('publicForm.title') }}</h2>
   <div class="form-container">
-    
-    <h2>Criar Novo Chamado</h2>
-    <form @submit.prevent="submitChamado">
-      <div class="form-group">
-        <label for="nome">Nome:</label>
-        <input
-          type="text"
-          id="nome"
-          v-model="form.nome"
-          required
-          placeholder="Seu nome"
-        />
-      </div>
 
-        <div class="form-group">
-        <label for="nome">Telefone Para Contato:</label>
+    <h2>{{ t('publicForm.heading') }}</h2>
+    <form @submit.prevent="submitCall">
+      <div class="form-group">
+        <label for="name">{{ t('publicForm.name') }}</label>
         <input
           type="text"
-          id="telefone"
-          v-model="form.telefone"
+          id="name"
+          v-model="form.name"
           required
-          placeholder="Ex: (11) 91234-5678"
+          :placeholder="t('publicForm.namePlaceholder')"
         />
       </div>
 
       <div class="form-group">
-        <label for="descricao">Descrição do Problema:</label>
+        <label for="phone">{{ t('publicForm.phone') }}</label>
+        <input
+          type="text"
+          id="phone"
+          v-model="form.phone"
+          required
+          :placeholder="t('publicForm.phonePlaceholder')"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="description">{{ t('publicForm.description') }}</label>
         <textarea
-          id="descricao"
-          v-model="form.descricao"
+          id="description"
+          v-model="form.description"
           required
-          placeholder="Descreva o problema..."
+          :placeholder="t('publicForm.descriptionPlaceholder')"
           rows="5"
         ></textarea>
       </div>
 
       <div class="form-group">
-        <label for="status">Status:</label>
+        <label for="status">{{ t('publicForm.status') }}</label>
         <input
           type="text"
           id="status"
-          v-model="form.status"
+          :value="t('status.open')"
           readonly
-          value="Aberto"
         />
       </div>
 
-      <button type="submit" class="submit-btn">Enviar Chamado</button>
+      <button type="submit" class="submit-btn">{{ t('publicForm.submit') }}</button>
     </form>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import api from '../api'
 
-const router = useRouter()
+const { t } = useI18n()
+
 const form = ref({
-  nome: '',
-  telefone: '',
-  descricao: '',
-  status: 'aberto',
+  name: '',
+  phone: '',
+  description: '',
 })
 
-const submitChamado = async () => {
+const submitCall = async () => {
   try {
     const payload = {
-      customer_name: form.value.nome,
-      phone: form.value.telefone,
-      description: form.value.descricao,
-      status: form.value.status,
+      customer_name: form.value.name,
+      phone: form.value.phone,
+      description: form.value.description,
+      status: 'open',
     }
 
     await api.post('/calls', payload)
 
-    alert('Chamado criado com sucesso!')
-    form.value = { nome: '', telefone: '', descricao: '', status: 'aberto' }
+    alert(t('publicForm.success'))
+    form.value = { name: '', phone: '', description: '' }
   } catch (error) {
-    console.error('Erro ao criar chamado:', error)
+    console.error('Error creating call:', error)
     if (error.response && error.response.status === 429) {
-      alert('Muitas tentativas. Aguarde um minuto e tente novamente.')
+      alert(t('publicForm.rateLimit'))
     } else {
-      alert('Erro ao criar chamado. Tente novamente.')
+      alert(t('publicForm.error'))
     }
   }
 }
@@ -92,7 +91,7 @@ const submitChamado = async () => {
 
 <style scoped>
 .form-container {
-  max-width: 800px; /* Largura maior para o container */
+  max-width: 800px;
   margin: 20px auto;
   padding: 30px;
   background: #fff;
@@ -122,7 +121,7 @@ label {
 
 input,
 textarea {
-  width: 100%; /* Ocupa toda a largura do form-group */
+  width: 100%;
   padding: 15px;
   border: 2px solid #ddd;
   border-radius: 8px;
@@ -137,7 +136,7 @@ textarea:focus {
 }
 
 textarea {
-  min-height: 150px; /* Altura maior para a descrição */
+  min-height: 150px;
 }
 
 input[readonly] {

@@ -1,32 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Funcionarios from '../views/Funcionarios.vue'
-import Chamados from '../views/Chamados.vue'
+import Employees from '../views/Employees.vue'
+import Calls from '../views/Calls.vue'
 import Login from '../views/Login.vue'
-import Forms from '../views/Formulario.vue'
+import PublicCallForm from '../views/PublicCallForm.vue'
 
-const requireAuth = (to, from, next) => {
-  const token = sessionStorage.getItem('token')
-  if (!token) {
-    return next('/login')
-  }
-  next()
-}
+const publicPages = ['/login', '/new-call']
 
 const routes = [
   { path: '/', redirect: '/login' },
-  { path: '/funcionarios', component: Funcionarios, beforeEnter: requireAuth }, // corrigido
-  { path: '/chamados', component: Chamados, beforeEnter: requireAuth },         // corrigido
+  { path: '/employees', component: Employees },
+  { path: '/calls', component: Calls },
   { path: '/login', component: Login },
-  { path: '/formulario', component: Forms}
+  { path: '/new-call', component: PublicCallForm },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 })
 
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/formulario']
   const authRequired = !publicPages.includes(to.path)
   const loggedIn = sessionStorage.getItem('token')
 
@@ -36,6 +29,5 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
-
 
 export default router

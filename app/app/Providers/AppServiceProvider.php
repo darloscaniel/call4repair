@@ -23,11 +23,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Mantém o contrato de JSON em arrays "crus" (sem o wrapper "data"),
-        // preservando a forma esperada pelo front-end.
+        // Keep JSON responses as plain arrays (no "data" wrapper),
+        // preserving the shape expected by the front-end.
         JsonResource::withoutWrapping();
 
-        // Limita a abertura pública de chamados: 5 requisições por minuto por IP.
+        // Throttle public call creation: 5 requests per minute per IP.
         RateLimiter::for('calls', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
         });

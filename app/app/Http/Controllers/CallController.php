@@ -14,7 +14,7 @@ class CallController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        // Retorna todos os chamados com os funcionários relacionados
+        // Return all calls with their related employees
         return CallResource::collection(Call::with('employees')->get());
     }
 
@@ -58,7 +58,7 @@ class CallController extends Controller
 
     public function destroy(Call $call): Response
     {
-        $call->employees()->detach(); // Remove relacionamentos antes de deletar
+        $call->employees()->detach(); // Remove relations before deleting
         $call->delete();
 
         return response()->noContent();

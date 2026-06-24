@@ -18,8 +18,8 @@ class Call extends Model
     ];
 
     /**
-     * Relacionamento N:N com funcionários.
-     * Um chamado pode ter vários funcionários.
+     * Many-to-many relationship with employees.
+     * A call can have many assigned employees.
      */
     public function employees()
     {

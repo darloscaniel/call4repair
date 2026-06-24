@@ -1,0 +1,84 @@
+{
+  "app": {
+    "title": "Call4Repair"
+  },
+  "nav": {
+    "employees": "👥 Funcionários",
+    "calls": "🛠️ Chamados",
+    "logout": "🔒 Sair"
+  },
+  "login": {
+    "title": "🔐 Login",
+    "email": "Email",
+    "password": "Senha",
+    "submit": "Entrar",
+    "openCall": "Abrir Chamado",
+    "invalidCredentials": "Credenciais inválidas.",
+    "genericError": "Erro ao tentar logar. Tente novamente."
+  },
+  "employees": {
+    "title": "👥 Funcionários",
+    "create": "Criar Funcionário",
+    "search": "🔍 Pesquisar funcionário...",
+    "name": "Nome",
+    "email": "Email",
+    "phone": "Telefone",
+    "actions": "Ações",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "confirmDelete": "Tem certeza que deseja excluir este funcionário?"
+  },
+  "calls": {
+    "title": "🛠️ Chamados",
+    "search": "🔍 Pesquisar cliente...",
+    "customer": "Cliente",
+    "phone": "Telefone",
+    "description": "Descrição",
+    "status": "Status",
+    "employees": "Funcionários",
+    "assign": "Clique para atribuir"
+  },
+  "callModal": {
+    "title": "Editar Chamado",
+    "description": "Descrição:",
+    "status": "Status:",
+    "employees": "Funcionários:",
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "employeeModal": {
+    "createTitle": "Cadastrar Funcionário",
+    "editTitle": "Editar Funcionário",
+    "name": "Nome:",
+    "age": "Idade:",
+    "phone": "Telefone:",
+    "email": "Email:",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "namePlaceholder": "Digite o nome",
+    "agePlaceholder": "Digite a idade",
+    "phonePlaceholder": "Digite o telefone",
+    "emailPlaceholder": "Digite o email"
+  },
+  "publicForm": {
+    "title": "🔧 Call4Repair 🔧",
+    "heading": "Criar Novo Chamado",
+    "name": "Nome:",
+    "namePlaceholder": "Seu nome",
+    "phone": "Telefone Para Contato:",
+    "phonePlaceholder": "Ex: (11) 91234-5678",
+    "description": "Descrição do Problema:",
+    "descriptionPlaceholder": "Descreva o problema...",
+    "status": "Status:",
+    "submit": "Enviar Chamado",
+    "success": "Chamado criado com sucesso!",
+    "error": "Erro ao criar chamado. Tente novamente.",
+    "rateLimit": "Muitas tentativas. Aguarde um minuto e tente novamente."
+  },
+  "status": {
+    "open": "Aberto",
+    "in_progress": "Em Andamento",
+    "done": "Concluído",
+    "rejected": "Recusado"
+  }
+}

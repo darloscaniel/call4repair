@@ -18,6 +18,7 @@ class CallResource extends JsonResource
             'phone'         => $this->phone,
             'description'   => $this->description,
             'status'        => $this->status,
+            'created_by'    => $this->created_by,
             'employees'     => EmployeeResource::collection($this->whenLoaded('employees')),
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,

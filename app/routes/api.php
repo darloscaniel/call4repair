@@ -5,7 +5,8 @@ use App\Http\Controllers\CallController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\UserController;
 
-Route::post('login', [UserController::class, 'login']);
+// Login is throttled per IP to slow down brute-force attempts.
+Route::post('login', [UserController::class, 'login'])->middleware('throttle:login');
 
 // Abertura pública de chamados (formulário do cliente) — limitada a 5/min por IP.
 Route::post('calls', [CallController::class, 'store'])->middleware('throttle:calls');

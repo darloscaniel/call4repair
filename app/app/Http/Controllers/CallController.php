@@ -36,6 +36,8 @@ class CallController extends Controller
             'phone'         => $validated['phone'],
             'description'   => $validated['description'],
             'status'        => $validated['status'],
+            // Set when a logged-in user opens the call; null for the public form.
+            'created_by'    => optional(auth('api')->user())->getKey(),
         ]);
 
         if (!empty($validated['employees'])) {
@@ -67,7 +69,7 @@ class CallController extends Controller
 
     public function destroy(Call $call): Response
     {
-        $call->employees()->detach(); // Remove relations before deleting
+        // Soft delete: keep the row (and its employee assignments) for history.
         $call->delete();
 
         return response()->noContent();

@@ -72,9 +72,7 @@ class EmployeeController extends Controller
             return response()->json(['message' => __('messages.employee.not_found')], 404);
         }
 
-        // Detach all calls linked to this employee before deleting
-        $employee->calls()->detach();
-
+        // Soft delete: keep the row (and call assignments) for history.
         $employee->delete();
 
         return response()->json(['message' => __('messages.employee.deleted')]);

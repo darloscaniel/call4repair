@@ -31,5 +31,10 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('calls', function (Request $request) {
             return Limit::perMinute(5)->by($request->ip());
         });
+
+        // Throttle login attempts: 5 per minute per IP (brute-force protection).
+        RateLimiter::for('login', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
     }
 }

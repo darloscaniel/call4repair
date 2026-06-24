@@ -158,7 +158,42 @@ class CallTest extends TestCase
             ->deleteJson("/api/calls/{$call->id}")
             ->assertNoContent();
 
-        $this->assertDatabaseMissing('calls', ['id' => $call->id]);
-        $this->assertDatabaseMissing('call_employee', ['call_id' => $call->id]);
+        // Soft delete: the row is kept (with deleted_at) and so is its history,
+        // but it no longer shows up in the default listing.
+        $this->assertSoftDeleted('calls', ['id' => $call->id]);
+        $this->assertDatabaseHas('call_employee', ['call_id' => $call->id]);
+
+        $this->withHeaders($this->authHeaders())
+            ->getJson('/api/calls')
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+    }
+
+    public function test_update_rejects_invalid_status_transition(): void
+    {
+        $call = Call::factory()->create(['status' => 'done']);
+
+        // done is terminal — reopening it is not a valid transition.
+        $this->withHeaders($this->authHeaders())
+            ->putJson("/api/calls/{$call->id}", ['status' => 'open'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['status']);
+
+        $this->assertDatabaseHas('calls', ['id' => $call->id, 'status' => 'done']);
+    }
+
+    public function test_update_allows_same_status_when_only_assigning_employees(): void
+    {
+        $call     = Call::factory()->create(['status' => 'done']);
+        $employee = Employee::factory()->create();
+
+        // Keeping the same (terminal) status while reassigning must be allowed.
+        $this->withHeaders($this->authHeaders())
+            ->putJson("/api/calls/{$call->id}", [
+                'status'    => 'done',
+                'employees' => [$employee->id],
+            ])
+            ->assertOk()
+            ->assertJsonCount(1, 'employees');
     }
 }

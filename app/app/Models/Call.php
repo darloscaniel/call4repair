@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Call extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
 
     protected $fillable = [
@@ -15,6 +17,7 @@ class Call extends Model
         'phone',
         'description',
         'status',
+        'created_by',
     ];
 
     /**
@@ -26,5 +29,14 @@ class Call extends Model
         return $this->belongsToMany(Employee::class, 'call_employee')
                     ->withPivot('assigned_at', 'status')
                     ->withTimestamps();
+    }
+
+    /**
+     * Registered user who opened the call (null when opened anonymously
+     * through the public form).
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

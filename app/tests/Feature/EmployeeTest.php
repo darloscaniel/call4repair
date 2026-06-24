@@ -140,6 +140,7 @@ class EmployeeTest extends TestCase
             ->deleteJson("/api/employees/{$employee->id}")
             ->assertOk();
 
-        $this->assertDatabaseMissing('employees', ['id' => $employee->id]);
+        // Soft delete keeps the row but excludes it from listings.
+        $this->assertSoftDeleted('employees', ['id' => $employee->id]);
     }
 }

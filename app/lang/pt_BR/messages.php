@@ -10,4 +10,7 @@ return [
         'not_found' => 'Funcionário não encontrado.',
         'deleted'   => 'Funcionário deletado com sucesso.',
     ],
+    'call' => [
+        'invalid_transition' => 'Não é possível mudar o status de ":from" para ":to".',
+    ],
 ];

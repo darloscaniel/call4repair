@@ -13,12 +13,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::firstOrCreate(
+        $user = User::firstOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name'     => 'Test User',
-                'password' => 'password', // hashed automaticamente pelo cast do model
+                'password' => 'password', // hashed automatically by the model cast
             ]
         );
+
+        $user->syncRoles('admin');
     }
 }

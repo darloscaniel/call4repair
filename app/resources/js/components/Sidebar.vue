@@ -4,6 +4,7 @@
 
     <nav class="menu">
       <RouterLink
+        v-if="can('manage employees')"
         to="/employees"
         class="menu-link"
         :class="{ active: $route.path === '/employees' }"
@@ -27,12 +28,13 @@
 <script setup>
 import { useRouter, RouterLink } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { can, clearAuth } from '../auth'
 
 const router = useRouter()
 const { t } = useI18n()
 
 const logout = () => {
-  sessionStorage.removeItem('token')
+  clearAuth()
   router.push('/login')
 }
 </script>

@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Call;
 use App\Models\Employee;
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -13,9 +15,18 @@ class CallTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function authHeaders(): array
+    protected function setUp(): void
     {
-        $user  = User::factory()->create();
+        parent::setUp();
+
+        $this->seed(RoleSeeder::class);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    private function authHeaders(string|array $roles = 'admin'): array
+    {
+        $user = User::factory()->create();
+        $user->syncRoles($roles);
         $token = JWTAuth::fromUser($user);
 
         return ['Authorization' => "Bearer {$token}"];
@@ -62,6 +73,28 @@ class CallTest extends TestCase
     public function test_listing_calls_requires_authentication(): void
     {
         $this->getJson('/api/calls')->assertStatus(401);
+    }
+
+    public function test_technician_cannot_delete_calls(): void
+    {
+        $call = Call::factory()->create();
+
+        // Technician can view/manage calls but lacks "delete calls".
+        $this->withHeaders($this->authHeaders('technician'))
+            ->deleteJson("/api/calls/{$call->id}")
+            ->assertStatus(403);
+
+        $this->assertDatabaseHas('calls', ['id' => $call->id]);
+    }
+
+    public function test_technician_can_view_calls(): void
+    {
+        Call::factory()->count(2)->create();
+
+        $this->withHeaders($this->authHeaders('technician'))
+            ->getJson('/api/calls')
+            ->assertOk()
+            ->assertJsonCount(2);
     }
 
     public function test_authenticated_user_can_list_calls_with_employees(): void

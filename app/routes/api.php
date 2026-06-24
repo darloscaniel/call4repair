@@ -11,10 +11,12 @@ Route::post('login', [UserController::class, 'login']);
 Route::post('calls', [CallController::class, 'store'])->middleware('throttle:calls');
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('calls', [CallController::class, 'index']);
-    Route::get('calls/{call}', [CallController::class, 'show']);
-    Route::put('calls/{call}', [CallController::class, 'update']);
-    Route::delete('calls/{call}', [CallController::class, 'destroy']);
-    Route::apiResource('employees', EmployeeController::class);
+    Route::get('calls', [CallController::class, 'index'])->middleware('permission:view calls');
+    Route::get('calls/{call}', [CallController::class, 'show'])->middleware('permission:view calls');
+    Route::put('calls/{call}', [CallController::class, 'update'])->middleware('permission:manage calls');
+    Route::delete('calls/{call}', [CallController::class, 'destroy'])->middleware('permission:delete calls');
+
+    Route::apiResource('employees', EmployeeController::class)
+        ->middleware('permission:manage employees');
 });
 

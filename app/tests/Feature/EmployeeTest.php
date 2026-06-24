@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Employee;
 use App\Models\User;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -12,9 +14,18 @@ class EmployeeTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function authHeaders(): array
+    protected function setUp(): void
     {
-        $user  = User::factory()->create();
+        parent::setUp();
+
+        $this->seed(RoleSeeder::class);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    private function authHeaders(string|array $roles = 'admin'): array
+    {
+        $user = User::factory()->create();
+        $user->syncRoles($roles);
         $token = JWTAuth::fromUser($user);
 
         return ['Authorization' => "Bearer {$token}"];
@@ -23,6 +34,14 @@ class EmployeeTest extends TestCase
     public function test_index_requires_authentication(): void
     {
         $this->getJson('/api/employees')->assertStatus(401);
+    }
+
+    public function test_technician_cannot_manage_employees(): void
+    {
+        // A technician lacks the "manage employees" permission.
+        $this->withHeaders($this->authHeaders('technician'))
+            ->getJson('/api/employees')
+            ->assertStatus(403);
     }
 
     public function test_authenticated_user_can_list_employees(): void

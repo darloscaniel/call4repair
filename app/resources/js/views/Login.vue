@@ -28,6 +28,7 @@ import { ref, onBeforeMount } from 'vue'
 import api from '../api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { setAuth, clearAuth, can } from '../auth'
 
 const email = ref('')
 const password = ref('')
@@ -40,7 +41,7 @@ const goToPublicForm = () => {
 }
 
 onBeforeMount(() => {
-  sessionStorage.removeItem('token')
+  clearAuth()
 })
 
 const login = async () => {
@@ -51,8 +52,8 @@ const login = async () => {
       password: password.value
     })
 
-    sessionStorage.setItem('token', response.data.token)
-    router.push('/employees')
+    setAuth(response.data)
+    router.push(can('manage employees') ? '/employees' : '/calls')
   } catch (err) {
     if (err.response && err.response.status === 401) {
       error.value = t('login.invalidCredentials')

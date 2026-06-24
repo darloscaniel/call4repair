@@ -4,6 +4,12 @@
 
     <nav class="menu">
       <RouterLink
+        to="/dashboard"
+        class="menu-link"
+        :class="{ active: $route.path === '/dashboard' }"
+      >{{ t('nav.dashboard') }}</RouterLink>
+
+      <RouterLink
         v-if="can('manage employees')"
         to="/employees"
         class="menu-link"

@@ -28,7 +28,7 @@ import { ref, onBeforeMount } from 'vue'
 import api from '../api'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { setAuth, clearAuth, can } from '../auth'
+import { setAuth, clearAuth } from '../auth'
 
 const email = ref('')
 const password = ref('')
@@ -53,7 +53,7 @@ const login = async () => {
     })
 
     setAuth(response.data)
-    router.push(can('manage employees') ? '/employees' : '/calls')
+    router.push('/dashboard')
   } catch (err) {
     if (err.response && err.response.status === 401) {
       error.value = t('login.invalidCredentials')

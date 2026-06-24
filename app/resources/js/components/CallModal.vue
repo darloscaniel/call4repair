@@ -4,17 +4,26 @@
       <h3>{{ t('callModal.title') }}</h3>
 
       <div class="form-group">
-        <label><strong>{{ t('callModal.description') }}</strong></label>
-        <p class="description">{{ call.description }}</p>
+        <label>{{ t('callModal.customer') }}</label>
+        <input v-model="edited.customer_name" type="text" class="input-text" />
+      </div>
+
+      <div class="form-group">
+        <label>{{ t('callModal.phone') }}</label>
+        <input v-model="edited.phone" type="tel" class="input-text" />
+      </div>
+
+      <div class="form-group">
+        <label>{{ t('callModal.description') }}</label>
+        <textarea v-model="edited.description" class="input-textarea" rows="3"></textarea>
       </div>
 
       <div class="form-group">
         <label>{{ t('callModal.status') }}</label>
         <select v-model="edited.status" class="input-select">
-          <option value="open">{{ t('status.open') }}</option>
-          <option value="in_progress">{{ t('status.in_progress') }}</option>
-          <option value="done">{{ t('status.done') }}</option>
-          <option value="rejected">{{ t('status.rejected') }}</option>
+          <option v-for="option in statusOptions" :key="option" :value="option">
+            {{ t(`status.${option}`) }}
+          </option>
         </select>
       </div>
 
@@ -47,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -62,9 +71,26 @@ const emit = defineEmits(['close', 'save'])
 const edited = ref({})
 const editedEmployeeIds = ref([])
 
+// Allowed status transitions — must mirror the backend CallStatus enum.
+const TRANSITIONS = {
+  open: ['in_progress', 'rejected'],
+  in_progress: ['done', 'rejected'],
+  done: [],
+  rejected: ['open'],
+}
+
+// The current status is always selectable, plus its valid next states.
+const statusOptions = computed(() => {
+  const current = props.call?.status
+  return [current, ...(TRANSITIONS[current] || [])]
+})
+
 watch(() => props.call, (newCall) => {
   edited.value = {
     id: newCall.id,
+    customer_name: newCall.customer_name,
+    phone: newCall.phone,
+    description: newCall.description,
     status: newCall.status,
     employees: [...(newCall.employees || [])]
   }
@@ -110,11 +136,20 @@ const save = () => {
   margin-bottom: 1.5rem;
 }
 
-.input-select {
+.input-select,
+.input-text,
+.input-textarea {
   width: 100%;
   padding: 0.5rem;
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.input-textarea {
+  resize: vertical;
 }
 
 .scrollbox {

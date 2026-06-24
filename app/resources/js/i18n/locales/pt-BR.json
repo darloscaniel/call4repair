@@ -3,9 +3,18 @@
     "title": "Call4Repair"
   },
   "nav": {
+    "dashboard": "🏠 Painel",
     "employees": "👥 Funcionários",
     "calls": "🛠️ Chamados",
     "logout": "🔒 Sair"
+  },
+  "dashboard": {
+    "title": "🏠 Painel do Administrador",
+    "subtitle": "Gerencie chamados e funcionários da oficina.",
+    "callsTitle": "Chamados",
+    "callsDesc": "Visualizar, editar e atribuir funcionários aos chamados.",
+    "employeesTitle": "Funcionários",
+    "employeesDesc": "Cadastrar, editar e remover funcionários."
   },
   "login": {
     "title": "🔐 Login",
@@ -40,6 +49,8 @@
   },
   "callModal": {
     "title": "Editar Chamado",
+    "customer": "Cliente:",
+    "phone": "Telefone:",
     "description": "Descrição:",
     "status": "Status:",
     "employees": "Funcionários:",

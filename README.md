@@ -66,6 +66,20 @@ escrita autenticadas exigem o header CSRF `X-XSRF-TOKEN` (o axios o envia
 automaticamente a partir do cookie `XSRF-TOKEN`). Clientes não-browser podem usar
 `Authorization: Bearer <token>` (sem CSRF).
 
+## Regras de negócio
+
+- **Status do chamado (máquina de estados):** as transições são restritas pelo enum
+  `App\Enums\CallStatus`: `open → in_progress|rejected`, `in_progress → done|rejected`,
+  `rejected → open` (reabertura), `done` é terminal. Manter o mesmo status é sempre
+  permitido (ex.: ao só reatribuir funcionários). Transição inválida retorna `422`.
+- **Exclusão (soft delete):** `calls` e `employees` usam soft delete — a linha é
+  mantida (`deleted_at`) e some das listagens, preservando o histórico de atribuições.
+- **Autoria do chamado:** chamados abertos por um usuário autenticado registram
+  `created_by`; o formulário público anônimo deixa o campo `null`.
+- **Rate limit:** `POST /login` e `POST /calls` são limitados a 5/min por IP.
+- **Painel:** após o login o usuário cai em `/dashboard`, que reúne os atalhos de
+  gestão (chamados e, para quem tem `manage employees`, funcionários).
+
 ## Produção & segurança
 
 - **Secrets:** o `.env` **não é versionado** (só o `.env.example`). Gere por ambiente:

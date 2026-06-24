@@ -133,6 +133,9 @@ const loadCalls = async () => {
 const handleSave = async (updated) => {
   try {
     await api.put(`/calls/${updated.id}`, {
+      customer_name: updated.customer_name,
+      phone: updated.phone,
+      description: updated.description,
       status: updated.status,
       employees: updated.employees.map((e) => e.id),
     })

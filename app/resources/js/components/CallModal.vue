@@ -27,7 +27,7 @@
         </select>
       </div>
 
-      <div class="field">
+      <div class="field" v-if="employees.length">
         <label>{{ t('callModal.employees') }}</label>
         <div class="scrollbox">
           <label
@@ -42,7 +42,6 @@
             />
             <span>{{ employee.name }}</span>
           </label>
-          <p v-if="!employees.length" class="muted">—</p>
         </div>
       </div>
 

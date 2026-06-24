@@ -133,13 +133,20 @@ const loadCalls = async () => {
 
 const handleSave = async (updated) => {
   try {
-    await api.put(`/calls/${updated.id}`, {
+    const payload = {
       customer_name: updated.customer_name,
       phone: updated.phone,
       description: updated.description,
       status: updated.status,
-      employees: updated.employees.map((e) => e.id),
-    })
+    }
+
+    // Only users who can manage employees may (re)assign them. Technicians
+    // omit the field entirely so the backend keeps the existing assignments.
+    if (can('manage employees')) {
+      payload.employees = updated.employees.map((e) => e.id)
+    }
+
+    await api.put(`/calls/${updated.id}`, payload)
     showModal.value = false
     await loadCalls()
   } catch (err) {

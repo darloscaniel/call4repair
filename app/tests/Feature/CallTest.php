@@ -131,6 +131,23 @@ class CallTest extends TestCase
         ]);
     }
 
+    public function test_missing_call_returns_json_404(): void
+    {
+        $this->withHeaders($this->authHeaders())
+            ->getJson('/api/calls/999999')
+            ->assertStatus(404)
+            ->assertJsonStructure(['message']);
+    }
+
+    public function test_api_errors_are_json_even_without_accept_header(): void
+    {
+        // No Accept: application/json header — the api/* rule must still
+        // produce a JSON error (assertJsonStructure fails on an HTML body).
+        $this->get('/api/calls/999999', $this->authHeaders())
+            ->assertStatus(404)
+            ->assertJsonStructure(['message']);
+    }
+
     public function test_can_delete_call(): void
     {
         $call     = Call::factory()->create();

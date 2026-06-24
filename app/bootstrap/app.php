@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->api(prepend: [
+            \App\Http\Middleware\ForceJsonAccept::class,
+        ]);
+
         $middleware->api(append: [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
@@ -25,5 +30,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Always render API errors as JSON (regardless of the Accept header),
+        // so clients never receive an HTML error page from /api/*.
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request, \Throwable $e) => $request->is('api/*') || $request->expectsJson()
+        );
     })->create();
